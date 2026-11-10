@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Epimetheus Leads</title>
+<style>
+  :root { --bg:#0b0d10; --panel:#14181d; --line:#232a32; --text:#e6e9ee; --muted:#8b95a1; --accent:#e5484d; --ok:#3fb950; }
+  * { box-sizing: border-box; }
+  body { margin:0; font:14px/1.5 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,sans-serif; background:var(--bg); color:var(--text); }
+  header { display:flex; align-items:center; justify-content:space-between; padding:16px 24px; border-bottom:1px solid var(--line); }
+  header h1 { font-size:16px; margin:0; letter-spacing:.3px; }
+  header .dot { color:var(--accent); }
+  .wrap { max-width:1100px; margin:0 auto; padding:24px; display:grid; gap:18px; }
+  .card { background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:18px; }
+  .card h2 { margin:0 0 12px; font-size:13px; text-transform:uppercase; letter-spacing:.8px; color:var(--muted); }
+  .row { display:flex; gap:12px; flex-wrap:wrap; }
+  label { display:block; font-size:12px; color:var(--muted); margin-bottom:4px; }
+  input, textarea, select { width:100%; background:#0e1216; color:var(--text); border:1px solid var(--line); border-radius:7px; padding:8px 10px; font:inherit; }
+  textarea { resize:vertical; min-height:70px; }
+  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  button { background:#1c222a; color:var(--text); border:1px solid var(--line); border-radius:7px; padding:8px 14px; cursor:pointer; font:inherit; }
+  button:hover { border-color:#3a4652; }
+  button.primary { background:var(--accent); border-color:var(--accent); color:#fff; font-weight:600; }
+  button.ghost { background:transparent; }
+  .stats { display:flex; gap:22px; flex-wrap:wrap; }
+  .stat .k { color:var(--muted); font-size:11px; text-transform:uppercase; letter-spacing:.6px; }
+  .stat .v { font-size:20px; font-weight:600; }
+  table { width:100%; border-collapse:collapse; }
+  th, td { text-align:left; padding:9px 8px; border-bottom:1px solid var(--line); vertical-align:top; }
+  th { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.6px; }
+  .score { font-weight:700; color:var(--accent); }
+  .sig { color:#c9d1d9; }
+  .muted { color:var(--muted); }
+  a { color:#79c0ff; text-decoration:none; }
+  .tag { display:inline-block; font-size:11px; padding:1px 7px; border-radius:99px; border:1px solid var(--line); color:var(--muted); }
+  .toast { position:fixed; right:20px; bottom:20px; background:#1c222a; border:1px solid var(--line); border-radius:8px; padding:10px 14px; max-width:420px; display:none; white-space:pre-wrap; }
+  .toast.show { display:block; }
+  .hint { font-size:12px; color:var(--muted); margin-top:6px; }
+  .empty { color:var(--muted); padding:14px 0; }
+</style>
+</head>
+<body>
+<header>
+  <h1><span class="dot">●</span> Epimetheus Leads <span class="muted" style="font-weight:400">— personal lead engine</span></h1>
+  <div class="muted" id="llmState">…</div>
+</header>
+
+<div class="wrap">
+  <section class="card">
+    <h2>Status</h2>
+    <div class="stats">
+      <div class="stat"><div class="k">Brief</div><div class="v" id="stBrief">—</div></div>
+      <div class="stat"><div class="k">Leads</div><div class="v" id="stLeads">—</div></div>
+      <div class="stat"><div class="k">LinkedIn</div><div class="v" id="stLinkedin">—</div></div>
+      <div class="stat"><div class="k">Campaigns</div><div class="v" id="stCampaigns">—</div></div>
+      <div class="stat"><div class="k">Credits</div><div class="v" id="stCredits">—</div></div>
+    </div>
+    <div class="hint" id="nextAction"></div>
+  </section>
+
+  <section class="card">
+    <h2>Brief — who you sell to</h2>
+    <div class="grid2">
+      <div>
+        <label>Website</label>
+        <input id="website" placeholder="https://epimetheus-red.vercel.app/" />
+      </div>
+      <div>
+        <label>Region</label>
+        <input id="region" placeholder="Global (English-speaking)" />
+      </div>
+    </div>
+    <div style="margin-top:12px">
+      <label>Offer (one sentence)</label>
+      <input id="offer" placeholder="Scoped AI security testing for AI apps and agents" />
+    </div>
+    <div class="grid2" style="margin-top:12px">
+      <div>
+        <label>Buyers (comma separated)</label>
+        <textarea id="buyers" placeholder="Founders and CTOs shipping AI agents, Security leads..."></textarea>
+      </div>
+      <div>
+        <label>Role keywords (comma separated)</label>
+        <textarea id="roles" placeholder="security, ai, llm, appsec, compliance"></textarea>
+      </div>
+    </div>
+    <div style="margin-top:12px">
+      <label>Exclusions (comma separated)</label>
+      <input id="exclusions" placeholder="competitor, agency" />
+    </div>
+    <div class="row" style="margin-top:14px">
+      <button class="primary" id="btnSave">Save brief</button>
+      <button id="btnBrief">Generate brief from website</button>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Find leads</h2>
+    <div class="row" style="align-items:flex-end">
+      <div style="width:140px"><label>Max accounts</label><input id="count" type="number" min="1" max="200" value="25" /></div>
+      <div style="flex:1"><label>Targets (optional — company,domain per line)</label><textarea id="targets" placeholder="Acme AI,acme.ai&#10;Vector Labs,vectorlabs.io"></textarea></div>
+    </div>
+    <div style="margin-top:12px"><label>Sources</label><div id="sources" class="hint">Loading sources…</div></div>
+    <div class="row" style="margin-top:14px">
+      <button class="primary" id="btnFind">Run pipeline</button>
+      <button class="ghost" id="btnTargets">Show loaded targets</button>
+    </div>
+    <div class="hint">Pipeline: sources → plain-language reason + age → AI fit-check → dedupe → LinkedIn/contact enrichment → credits → outreach queue. Free, local.</div>
+  </section>
+
+  <section class="card">
+    <h2>Leads</h2>
+    <div id="leads"><div class="empty">No leads yet. Run a scan.</div></div>
+  </section>
+
+  <section class="card">
+    <h2>Campaigns</h2>
+    <div class="row" style="align-items:flex-end">
+      <div style="flex:1"><label>New campaign name</label><input id="campName" placeholder="AI security founders — Q4" /></div>
+      <button id="btnCampaign">Create draft</button>
+    </div>
+    <div id="campaigns" class="hint" style="margin-top:12px"></div>
+    <div class="hint">Outreach is queued for manual/approved sending in this build. No LinkedIn automation is enabled by default.</div>
+  </section>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+function toast(msg) {
+  const t = $("toast");
+  t.textContent = typeof msg === "string" ? msg : JSON.stringify(msg, null, 2);
+  t.classList.add("show");
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => t.classList.remove("show"), 6000);
+}
+async function api(path, opts) {
+  const res = await fetch(path, opts);
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || res.statusText);
+  return data;
+}
+const arr = (s) => s.split(",").map(x => x.trim()).filter(Boolean);
+
+async function loadStatus() {
+  try {
+    const s = await api("/api/status");
+    $("stBrief").textContent = s.brief.complete ? "Ready" : "Missing";
+    $("stLeads").textContent = s.free_sample.delivered;
+    $("stLinkedin").textContent = s.linkedin.connected ? "Connected" : "Not connected";
+    $("stCampaigns").textContent = s.campaigns;
+    $("stCredits").textContent = s.credits;
+    $("nextAction").textContent = "Next: " + s.recommended_next_action + " — " + s.message;
+    $("llmState").textContent = s.llm_enabled ? "LLM on" : "LLM off (heuristic)";
+  } catch (e) { toast("Status error: " + e.message); }
+}
+
+async function loadSettings() {
+  try {
+    const { settings } = await api("/api/settings");
+    $("website").value = settings.website || "";
+    $("region").value = settings.region || "";
+    $("offer").value = settings.offer || "";
+    $("buyers").value = (settings.buyers || []).join(", ");
+    $("roles").value = (settings.roles || []).join(", ");
+    $("exclusions").value = (settings.exclusions || []).join(", ");
+  } catch (e) { toast("Settings error: " + e.message); }
+}
+
+async function loadLeads() {
+  try {
+    const { leads } = await api("/api/leads?limit=200");
+    const el = $("leads");
+    if (!leads.length) { el.innerHTML = '<div class="empty">No leads yet. Run the pipeline.</div>'; return; }
+    const rows = leads.map(l => `
+      <tr>
+        <td><strong>${esc(l.company)}</strong><div class="muted">${esc(l.domain)}</div></td>
+        <td class="score">${l.score}</td>
+        <td class="sig">${esc(l.signal_label || l.signal || "")}<div class="muted">${l.signal_age_days == null ? "" : l.signal_age_days + "d old"}</div></td>
+        <td>${esc(l.reason || "")}${l.source_url ? `<div><a href="${esc(l.source_url)}" target="_blank" rel="noreferrer">source</a></div>` : ""}</td>
+        <td><span class="tag">${esc(l.source || "—")}</span><div class="muted">fit: ${esc(l.fit)}${l.confidence ? " (" + Math.round(l.confidence * 100) + "%)" : ""}</div></td>
+        <td><span class="tag">${esc(l.status)}</span>${l.credits_spent ? `<div class="muted">${l.credits_spent} cr</div>` : ""}</td>
+        <td style="white-space:nowrap">
+          <button class="ghost" onclick="setFit(${l.id},'fit')">Fit</button>
+          <button class="ghost" onclick="setFit(${l.id},'not_fit')">Not fit</button>
+          <button class="ghost" onclick="explain(${l.id})">Why?</button>
+        </td>
+      </tr>`).join("");
+    el.innerHTML = `<table><thead><tr><th>Company</th><th>Score</th><th>Signal</th><th>Why</th><th>Source / fit</th><th>Status</th><th></th></tr></thead><tbody>${rows}</tbody></table>`;
+  } catch (e) { toast("Leads error: " + e.message); }
+}
+
+async function loadSources() {
+  try {
+    const { sources } = await api("/api/sources");
+    $("sources").innerHTML = sources.map(s => `
+      <label style="display:flex;align-items:center;gap:6px;color:var(--text);margin:3px 0">
+        <input type="checkbox" data-src="${esc(s.name)}" ${s.selected ? "checked" : ""} style="width:auto" />
+        ${esc(s.label)} <span class="muted">— ${esc(s.requires)}${s.available ? "" : " (not configured)"}</span>
+      </label>`).join("");
+  } catch (e) { $("sources").textContent = "Sources error: " + e.message; }
+}
+
+async function explain(id) {
+  try {
+    const r = await api("/api/leads/" + id + "/explain");
+    const lines = r.signals.map(s => `• [${s.source || "?"}] ${s.label} — ${s.date} (${s.points == null ? "" : s.points.toFixed(1) + " pts"})`).join("\n");
+    toast(`${r.lead.company}\nfit: ${r.lead.fit} — ${r.lead.fit_reason || ""}\n\n${lines}`);
+  } catch (e) { toast(e.message); }
+}
+
+async function loadCampaigns() {
+  try {
+    const { campaigns } = await api("/api/campaigns");
+    $("campaigns").innerHTML = campaigns.length
+      ? campaigns.map(c => `#${c.id} — ${esc(c.name)} <span class="tag">${c.status}</span>`).join("<br>")
+      : "No campaigns yet.";
+  } catch (e) { toast("Campaigns error: " + e.message); }
+}
+
+function esc(s) { return String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c])); }
+
+async function setFit(id, fit) {
+  try {
+    await api("/api/leads/" + id, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ fit, status: fit === "not_fit" ? "hidden" : "new" }) });
+    toast("Lead updated");
+    loadLeads(); loadStatus();
+  } catch (e) { toast(e.message); }
+}
+
+$("btnSave").onclick = async () => {
+  try {
+    await api("/api/settings", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({
+      website: $("website").value, region: $("region").value, offer: $("offer").value,
+      buyers: arr($("buyers").value), roles: arr($("roles").value), exclusions: arr($("exclusions").value)
+    })});
+    toast("Brief saved"); loadStatus();
+  } catch (e) { toast(e.message); }
+};
+
+$("btnBrief").onclick = async () => {
+  try {
+    toast("Generating brief…");
+    const r = await api("/api/brief", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ website: $("website").value }) });
+    toast("Brief generated (" + r.source + ")" + (r.note ? "\n" + r.note : ""));
+    loadSettings(); loadStatus();
+  } catch (e) { toast(e.message); }
+};
+
+$("btnFind").onclick = async () => {
+  try {
+    const targets = $("targets").value.split("\n").map(l => l.trim()).filter(Boolean).map(l => {
+      const [company, domain] = l.split(",");
+      return { company: (company||"").trim(), domain: (domain||"").trim() };
+    }).filter(t => t.company && t.domain);
+    const sources = Array.from(document.querySelectorAll('#sources input[type=checkbox]')).filter(c => c.checked).map(c => c.getAttribute('data-src'));
+    toast("Running pipeline… this can take a few seconds per company.");
+    const r = await api("/api/find", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ count: Number($("count").value), sources: sources.length ? sources : undefined, targets: targets.length ? targets : undefined }) });
+    toast(`Targets ${r.scannedTargets} · candidates ${r.candidates} · deduped ${r.deduped} · fit ${r.fitPassed}/${r.fitChecked} · new ${r.leadsCreated} · updated ${r.leadsUpdated} · credits ${r.creditsSpent}` + (r.note ? "\n" + r.note : ""));
+    loadLeads(); loadStatus();
+  } catch (e) { toast(e.message); }
+};
+
+$("btnTargets").onclick = async () => {
+  try {
+    const r = await api("/api/targets");
+    toast(r.count ? r.targets.map(t => t.company + " — " + t.domain).join("\n") : "No targets. Add data/targets.csv or paste targets above.");
+  } catch (e) { toast(e.message); }
+};
+
+$("btnCampaign").onclick = async () => {
+  try {
+    await api("/api/campaigns", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: $("campName").value || "Untitled campaign" }) });
+    $("campName").value = ""; toast("Campaign created"); loadCampaigns(); loadStatus();
+  } catch (e) { toast(e.message); }
+};
+
+loadStatus(); loadSettings(); loadLeads(); loadCampaigns(); loadSources();
+</script>
+</body>
+</html>
