@@ -40,6 +40,19 @@ function rowToSettings(row: Record<string, unknown> | undefined): Settings {
   };
 }
 
+export interface AccountRow {
+  id: number;
+  name: string;
+  email: string | null;
+}
+
+export function getAccount(accountId = 1): AccountRow {
+  const row = getDb().prepare("SELECT id, name, email FROM accounts WHERE id = ?").get(accountId) as unknown as
+    | AccountRow
+    | undefined;
+  return row ?? { id: accountId, name: "LetMeLead", email: null };
+}
+
 export function getSettings(accountId = 1): Settings {
   const row = getDb().prepare("SELECT * FROM settings WHERE account_id = ?").get(accountId) as
     | Record<string, unknown>

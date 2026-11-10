@@ -32,7 +32,7 @@ async function fetchSite(url: string): Promise<string> {
   try {
     const res = await fetch(url, {
       signal: controller.signal,
-      headers: { "User-Agent": "epimetheus-leads/0.1 (+local research tool)" },
+      headers: { "User-Agent": "letmelead/0.1 (+local research tool)" },
       redirect: "follow",
     });
     return await res.text();

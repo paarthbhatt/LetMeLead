@@ -6,4 +6,4 @@ getDb();
 const server = createMcpServer();
 const transport = new StdioServerTransport();
 await server.connect(transport);
-console.error("epimetheus-leads MCP server running on stdio");
+console.error("letmelead MCP server running on stdio");

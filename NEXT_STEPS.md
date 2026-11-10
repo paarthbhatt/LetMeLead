@@ -2,8 +2,8 @@
 
 ## Context
 
-- **Project**: `C:\Users\Parth\epimetheus-leads` — a local, free lead engine for **Epimetheus Red**
-  (scoped AI security testing). Dashboard + MCP server, SQLite, no billing.
+- **Project**: a local, free buying-signal lead engine for **any company or client**
+  (repo: LetMeLead). Dashboard + MCP server, SQLite, no billing.
 - **Pipeline today**: brief → sources (public job/news/tech scan, Reddit) → plain-language reason +
   age → AI fit-check → dedupe → enrichment → credits → outreach queue.
 - **Target repo**: https://github.com/paarthbhatt/LetMeLead.git
@@ -101,29 +101,24 @@ Free alternatives to add while here (all no-key):
 - Hacker News Algolia API, Bluesky public search, Mastodon public search, Google News RSS,
   GitHub search, Product Hunt RSS, dev.to/Stack Exchange. Keep them optional and off by default.
 
-## Task 3 — Configure Epimetheus Red (all website/offer/buyers/targets)
+## Task 3 — Configure a company profile and target list
 
-Use the real site: https://epimetheus-red.vercel.app/ (fetch it, extract offer + buyer language).
+LetMeLead is industry-agnostic. Set a profile for the company or client you are
+generating leads for via `PUT /api/settings` (or the `update_settings` MCP tool):
 
-Set via `PUT /api/settings` (or the `update_settings` MCP tool):
+- `website`: the company's site (used by `generate_brief`).
+- `offer`: what they sell, in one or two plain sentences.
+- `buyers`: the personas who buy it.
+- `roles`: role keywords used by job-board signals.
+- `region`: target geography.
+- `exclusions`: competitors, agencies, students, anyone who asked not to be contacted.
+- `sources`: free set only (`public_scan`, `reddit`, and Agent Reach channels after Task 2).
+- `target_list`: path to the target CSV.
 
-- `website`: `https://epimetheus-red.vercel.app/`
-- `offer`: scoped AI security testing for AI apps and agents (red-team, prompt injection,
-  tool/agent abuse, data exfiltration, guardrail bypass), with a clear report + remediation.
-- `buyers`: founders/CTOs shipping AI agents; AI/ML platform leaders; security/risk/compliance
-  leads at AI product companies; teams deploying RAG/agents with tool access.
-- `roles`: security, ai, ml, platform, engineering, compliance, cto, founder, red team.
-- `region`: Global (English-speaking) — prioritize US/EU.
-- `exclusions`: competitors, staffing agencies, students, crypto-only, companies already
-  breached/under active incident (avoid).
-- `sources`: free set only (`public_scan`, `reddit`, `reach_web`, `reach_x`, `reach_reddit`,
-  `reach_linkedin`, `reach_facebook`), skip paid-key sources.
-- `target_list`: point at the new CSV.
+Replace `data/targets.csv` with a real ICP list (company, domain, country) — 20–50 rows.
+No paid discovery service.
 
-Replace `data/targets.csv` with a real ICP list (company, domain, country) of AI-native
-companies shipping agents/RAG. Keep 20–50 rows. No paid discovery service.
-
-Then run `POST /api/brief` (or `generate_brief`) to let the brief reflect the site, and verify
+Then run `POST /api/brief` (or `generate_brief`) from the website, and verify
 `GET /api/status`.
 
 ## Task 4 — Wire MCP, web, dashboard, docs

@@ -1,6 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import {
+  getAccount,
   getSettings,
   updateSettings,
   getBalance,
@@ -38,6 +39,7 @@ function json(obj: unknown) {
 }
 
 export function setupStatus() {
+  const account = getAccount(ACCOUNT_ID);
   const settings = getSettings(ACCOUNT_ID);
   const linkedin = listLinkedinAccounts(ACCOUNT_ID)[0];
   const balance = getBalance(ACCOUNT_ID);
@@ -71,7 +73,7 @@ export function setupStatus() {
   }
 
   return {
-    account: { id: ACCOUNT_ID, name: "Epimetheus Red" },
+    account: { id: ACCOUNT_ID, name: account.name },
     brief: { complete: settings.brief_complete, offer: settings.offer, buyers: settings.buyers, region: settings.region },
     free_sample: { status: freeSampleStatus, delivered, target },
     linkedin: { connected: Boolean(linkedin && linkedin.status === "connected"), handle: linkedin?.handle || null },
@@ -87,7 +89,7 @@ export function setupStatus() {
 }
 
 export function createMcpServer(): McpServer {
-  const server = new McpServer({ name: "epimetheus-leads", version: "0.1.0" });
+  const server = new McpServer({ name: "letmelead", version: "0.1.0" });
 
   server.registerTool(
     "get_setup_status",

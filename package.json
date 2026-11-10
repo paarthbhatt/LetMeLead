@@ -1,9 +1,9 @@
 {
-  "name": "epimetheus-leads",
+  "name": "letmelead",
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Personal, local clone of Ekos Leads for Epimetheus Red: buying-signal lead finder + LinkedIn campaign model, driven by an MCP agent interface.",
+  "description": "Local, free buying-signal lead engine: find companies showing real buying signals, review why, enrich contacts, and run outreach. Driven by a dashboard and an MCP agent interface.",
   "scripts": {
     "start": "tsx src/index.ts",
     "dev": "tsx watch src/index.ts",

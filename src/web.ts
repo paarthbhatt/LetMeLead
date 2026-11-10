@@ -46,7 +46,7 @@ export function createApp() {
   const here = dirname(fileURLToPath(import.meta.url));
   app.use(express.static(join(here, "..", "public")));
 
-  app.get("/health", (_req, res) => res.json({ ok: true, name: "epimetheus-leads", version: "0.1.0" }));
+  app.get("/health", (_req, res) => res.json({ ok: true, name: "letmelead", version: "0.1.0" }));
 
   // ---- MCP (Streamable HTTP, session-based) ----
   const transports = new Map<string, StreamableHTTPServerTransport>();

@@ -1,17 +1,18 @@
 ---
-name: epimetheus-leads
-description: Personal local lead engine for Epimetheus Red. Find B2B buyers showing a real buying signal right now, review them, and draft LinkedIn outreach, driven from Claude Code, Codex, Cursor or any MCP client through the local Epimetheus Leads MCP server. Use when the user wants leads, wants to know who is ready to buy, wants to start or check a campaign, or asks how outreach is doing.
+name: letmelead
+description: Local buying-signal lead engine for any company or client. Find B2B buyers showing a real buying signal right now, review why, enrich contacts, and draft outreach, driven from Claude Code, Codex, Cursor or any MCP client through the local LetMeLead MCP server. Use when the user wants leads, wants to know who is ready to buy, wants to start or check a campaign, or asks how outreach is doing.
 metadata:
-  author: Parth (Epimetheus Red)
+  author: Parth
   version: "0.1.0"
 ---
 
-# Epimetheus Leads (local)
+# LetMeLead (local)
 
 Find the people who want to buy, show why (the buying signal, in plain words, with
-how old it is), and draft LinkedIn outreach. This is a self-hosted local build. It
-talks to a local MCP server (Streamable HTTP at `http://127.0.0.1:8787/mcp`, or stdio
-via `npm run mcp:stdio`). No Ekos account, no API keys of the user's own required.
+how old it is), and draft outreach. This is a self-hosted local build that works for
+any company or client. It talks to a local MCP server (Streamable HTTP at
+`http://127.0.0.1:8787/mcp`, or stdio via `npm run mcp:stdio`). No third-party
+account or paid API is required for the default sources.
 
 Execution mode: local. Never ask the user to paste a secret into chat.
 

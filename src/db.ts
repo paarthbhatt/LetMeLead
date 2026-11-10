@@ -147,19 +147,19 @@ export function getDb(): DatabaseSync {
 function seed(conn: DatabaseSync): void {
   const existing = conn.prepare("SELECT id FROM accounts WHERE id = 1").get() as { id?: number } | undefined;
   if (!existing) {
-    conn.prepare("INSERT INTO accounts (id, name, email) VALUES (1, ?, ?)").run("Epimetheus Red", "");
+    conn.prepare("INSERT INTO accounts (id, name, email) VALUES (1, ?, ?)").run("LetMeLead", "");
     conn.prepare(
       `INSERT INTO settings (account_id, website, offer, buyers, roles, region, exclusions, target_list, sources, brief_complete, updated_at)
        VALUES (1, ?, ?, ?, ?, ?, ?, ?, ?, 0, datetime('now'))`
     ).run(
-      "https://epimetheus-red.vercel.app/",
-      "Scoped AI security testing for AI apps and agents",
-      JSON.stringify(["Founders and CTOs shipping AI agents", "AI/ML engineering leaders", "Security and compliance leads at AI product companies"]),
-      JSON.stringify(["security", "ai", "ml", "machine learning", "appsec", "llm", "ai security", "compliance", "soc2", "red team"]),
+      "",
+      "",
+      JSON.stringify([]),
+      JSON.stringify(["founder", "ceo", "cto", "vp engineering", "head of engineering", "head of marketing", "head of sales", "operations", "procurement", "security", "compliance"]),
       "Global (English-speaking)",
       JSON.stringify([]),
       "",
-      JSON.stringify(["public_scan", "reddit"])
+      JSON.stringify([])
     );
     conn.prepare("INSERT INTO linkedin_accounts (account_id, handle, status) VALUES (1, ?, 'disconnected')").run("");
     conn.prepare("INSERT INTO credits_ledger (account_id, delta, reason) VALUES (1, 0, 'initial')").run();

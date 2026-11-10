@@ -30,7 +30,7 @@ export async function fetchJson<T>(url: string, init: RequestInit = {}, timeoutM
     const res = await fetch(url, {
       ...init,
       signal: controller.signal,
-      headers: { "User-Agent": "epimetheus-leads/0.1 (+local research tool)", ...(init.headers || {}) },
+      headers: { "User-Agent": "letmelead/0.1 (+local research tool)", ...(init.headers || {}) },
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return (await res.json()) as T;
