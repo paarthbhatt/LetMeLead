@@ -105,6 +105,9 @@ export const api = {
   sources: () => request<Source[]>("/v1/sources"),
   updateSource: (id: string, body: Record<string, unknown>) =>
     request<Source>(`/v1/sources/${id}`, { method: "PATCH", body }),
+  signalCatalog: () => request<SignalCatalog>("/v1/signals/catalog"),
+  setSignal: (id: string, enabled: boolean) =>
+    request<{ id: string; enabled: boolean }>(`/v1/signals/${id}`, { method: "PUT", body: { enabled } }),
   scan: (body: { sources?: string[]; wait?: boolean; limit_targets?: number }) =>
     request<{ status: string; report?: Record<string, unknown> }>("/v1/sources/scan", { method: "POST", body }),
   targets: (limit = 100) => request<Page<Target>>(`/v1/targets?limit=${limit}`),
@@ -210,6 +213,22 @@ export type Source = {
   last_error: string | null;
 };
 export type Target = { id: string; company: string; domain: string; country: string | null; active: boolean };
+export type SignalStatus = "live" | "partly_live" | "by_hand";
+export type SignalDef = {
+  id: string;
+  label: string;
+  description: string;
+  why_now: string;
+  how_it_works: string;
+  status: SignalStatus;
+  status_label: string;
+  channels: string[];
+  adapters: string[];
+  automatic: boolean;
+  enabled: boolean;
+};
+export type SignalCategory = { id: string; label: string; signals: SignalDef[] };
+export type SignalCatalog = { categories: SignalCategory[]; legend: Record<string, string> };
 export type Lead = {
   id: string;
   company: string;
@@ -227,6 +246,7 @@ export type Lead = {
   email: string | null;
   claimed_at: string | null;
   created_at: string;
+  contact: { name: string | null; title: string | null; linkedin_url: string | null } | null;
 };
 export type Evidence = {
   id: string;

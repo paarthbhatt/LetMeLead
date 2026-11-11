@@ -28,6 +28,9 @@ os.environ.update(
         # Pin the unreachable-Redis fallback so rate limiting is deterministic
         # whether or not a live Redis happens to be listening on this machine.
         "REDIS_URL": "redis://127.0.0.1:9/0",
+        # The suite makes far more auth calls per minute than a real client.
+        "RATE_LIMIT_AUTH_PER_MIN": "10000",
+        "RATE_LIMIT_DEFAULT_PER_MIN": "10000",
     }
 )
 

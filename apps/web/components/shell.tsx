@@ -9,6 +9,7 @@ import {
   Linkedin,
   LogOut,
   Moon,
+  Radio,
   Send,
   Settings,
   Sparkles,
@@ -25,6 +26,7 @@ import { toggleTheme } from "./providers";
 import { Badge, Button } from "./ui";
 
 const NAV = [
+  { href: "/signals", label: "Signals", icon: Radio },
   { href: "/leads", label: "Leads", icon: LayoutList },
   { href: "/campaigns", label: "Campaigns", icon: Send },
   { href: "/replies", label: "Replies", icon: Inbox },

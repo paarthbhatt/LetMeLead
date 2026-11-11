@@ -69,6 +69,26 @@ class Membership(Base, TimestampMixin):
     user: Mapped[User] = relationship()
 
 
+class TenantSignal(Base):
+    """A tenant's on/off choice for one signal from the static catalog.
+
+    Rows exist only for signals the tenant has explicitly toggled; absent rows
+    mean "catalog default" (see signals_catalog.SignalDef.enabled_by_default).
+    """
+
+    __tablename__ = "tenant_signals"
+    __table_args__ = (sa.CheckConstraint("signal_id <> ''", name="ck_tenant_signal_id"),)
+
+    tenant_id: Mapped[uuid.UUID] = mapped_column(
+        sa.ForeignKey("tenants.id", ondelete="CASCADE"), primary_key=True
+    )
+    signal_id: Mapped[str] = mapped_column(sa.String(64), primary_key=True)
+    enabled: Mapped[bool] = mapped_column(sa.Boolean, default=True, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(
+        sa.DateTime(timezone=True), default=utcnow, onupdate=utcnow, nullable=False
+    )
+
+
 class ApiKey(Base, TimestampMixin):
     __tablename__ = "api_keys"
 

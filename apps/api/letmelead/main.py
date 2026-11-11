@@ -18,7 +18,18 @@ from . import __version__, ratelimit
 from .config import settings
 from .db import get_db
 from .errors import envelope, install_error_handlers
-from .routers import auth, billing, campaigns, integrations, leads, linkedin, replies, sources, tenants
+from .routers import (
+    auth,
+    billing,
+    campaigns,
+    integrations,
+    leads,
+    linkedin,
+    replies,
+    signals,
+    sources,
+    tenants,
+)
 
 
 class JsonFormatter(logging.Formatter):
@@ -104,7 +115,9 @@ def create_app() -> FastAPI:
             tenant_hint = request.headers.get("x-tenant-id") or request.headers.get("x-api-key", "")[:12]
             identity = tenant_hint or (request.client.host if request.client else "anonymous")
             group = request.url.path.split("/")[2] if len(request.url.path.split("/")) > 2 else "root"
-            limit = 20 if group == "auth" else 600
+            limit = (
+                settings.rate_limit_auth_per_min if group == "auth" else settings.rate_limit_default_per_min
+            )
             allowed, retry_after = ratelimit.check(f"{identity}:{group}", limit, 60)
             if not allowed:
                 return JSONResponse(
@@ -128,6 +141,7 @@ def create_app() -> FastAPI:
     app.include_router(tenants.router, prefix="/v1")
     app.include_router(sources.router, prefix="/v1")
     app.include_router(sources.targets_router, prefix="/v1")
+    app.include_router(signals.router, prefix="/v1")
     app.include_router(leads.router, prefix="/v1")
     app.include_router(campaigns.router, prefix="/v1")
     app.include_router(replies.router, prefix="/v1")

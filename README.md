@@ -11,7 +11,7 @@ Signals show timing, not intent to buy. Every lead carries its source URL, a pla
 | Stage | Behaviour |
 | --- | --- |
 | **Watchlist** | Paste a website → an ICP brief is built (from the page, or from what you paste) → a target list is created. |
-| **Signals** | Seven adapters collect dated evidence: company job boards, news, Reddit, X, Google Maps, Facebook pages, review feeds. |
+| **Signals** | Seven adapters collect dated evidence: company job boards, news, Reddit, X, Google Maps, Facebook pages, review feeds. The dashboard's Signals page shows the full catalog — 51 signals across 8 categories with an honest Live / Partly live / By hand status — and each tenant toggles the ones it wants. |
 | **Qualification** | Signals are de-duplicated per real-world event, decayed by age, scored, and qualified with an LLM when one is configured (lexical heuristics otherwise — never a silent rejection). |
 | **Leads** | Ranked leads with reason, signal age, fit confidence and evidence timeline. Claim with credits or mark not-a-fit (the reason feeds back into qualification). |
 | **Outreach** | Campaigns + sequences rendered per lead from its own signal. Sending ramps 5→20/day with jitter, only on weekdays, only inside business hours, and pauses the moment a reply arrives. |
@@ -96,6 +96,7 @@ POST /auth/signup|login|refresh|logout      GET /auth/me, /auth/google
 GET|PATCH /tenant                           POST /tenant/onboarding
 GET|POST /tenant/members  /tenant/api-keys
 GET /sources  PATCH /sources/{id}  POST /sources/scan
+GET /signals/catalog  PUT /signals/{id}     (toggle a signal on or off)
 GET|POST /targets  POST /targets/import
 GET /leads  GET /leads/{id}  POST /leads/{id}/claim|not-fit
 GET|POST /campaigns  GET|PATCH /campaigns/{id}

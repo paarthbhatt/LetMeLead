@@ -20,6 +20,10 @@ class Settings(BaseSettings):
     database_url: str = "postgresql+psycopg://letmelead:letmelead@localhost:5432/letmelead"
     redis_url: str = "redis://localhost:6379/0"
 
+    # --- rate limits (per identity per minute; auth is tighter than the rest) ---
+    rate_limit_auth_per_min: int = 20
+    rate_limit_default_per_min: int = 600
+
     # --- auth ---
     jwt_secret: str = Field(default="dev-only-change-me", min_length=8)
     jwt_algorithm: str = "HS256"

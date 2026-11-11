@@ -63,7 +63,11 @@ def list_leads(
     min_score: float | None = None,
     q: str | None = None,
 ):
-    stmt = sa.select(Lead).where(Lead.tenant_id == actor.tenant_id)
+    stmt = (
+        sa.select(Lead)
+        .where(Lead.tenant_id == actor.tenant_id)
+        .options(sa.orm.selectinload(Lead.contacts))
+    )
     if status:
         stmt = stmt.where(Lead.status == status)
     if fit:
@@ -75,7 +79,11 @@ def list_leads(
         stmt = stmt.where(sa.or_(sa.func.lower(Lead.company).like(needle), Lead.domain.like(needle)))
     rows = list(db.scalars(apply_cursor(stmt, Lead, cursor, limit)).all())
     items, next_cursor = page(rows, limit, Lead)
-    return Page(items=[LeadOut.model_validate(row) for row in items], next_cursor=next_cursor)
+    leads = [LeadOut.model_validate(row) for row in items]
+    for lead_out, row in zip(leads, items, strict=True):
+        if row.contacts:
+            lead_out.contact = ContactOut.model_validate(row.contacts[0])
+    return Page(items=leads, next_cursor=next_cursor)
 
 
 @router.get("/{lead_id}", response_model=LeadDetail)

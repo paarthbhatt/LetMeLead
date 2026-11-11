@@ -214,6 +214,7 @@ class LeadOut(ORMModel):
     email: str | None
     claimed_at: datetime | None
     created_at: datetime
+    contact: ContactOut | None = None
 
 
 class LeadDetail(LeadOut):
