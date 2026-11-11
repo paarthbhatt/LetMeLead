@@ -1,0 +1,25 @@
+# Caddy terminates TLS for one VPS. Enable the "tls" profile:
+#   docker compose --profile tls up -d
+{$DOMAIN:localhost} {
+	encode zstd gzip
+
+	@mcp path /mcp /mcp/*
+	handle @mcp {
+		reverse_proxy mcp:8765
+	}
+
+	@api path /v1/* /docs /openapi.json
+	handle @api {
+		reverse_proxy api:8000
+	}
+
+	handle {
+		reverse_proxy web:3000
+	}
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+	}
+}

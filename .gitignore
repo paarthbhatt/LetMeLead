@@ -1,10 +1,28 @@
-node_modules/
-dist/
-data/
-runs/
-.env
-*.log
-.DS_Store
+# python
+.venv/
 __pycache__/
 *.pyc
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+
+# node / next
+node_modules/
+.next/
+out/
 *.tsbuildinfo
+
+# local state and secrets
+.env
+.env.local
+data/
+runs/
+*.db
+*.sqlite3
+
+# logs and OS noise
+*.log
+.DS_Store
+
+# docker
+pgdata/

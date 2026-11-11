@@ -1,171 +1,161 @@
 # LetMeLead
 
-A local, free **buying-signal lead engine for any company or client**. It finds
-companies showing real buying signals right now, explains *why* in plain language
-(with the signal's age), checks fit, enriches contacts, and queues outreach. Works
-for any offer and any ICP — configure a company profile and a target list, and it
-runs.
+A multi-tenant, done-for-you lead engine. Paste your website, get qualified decision-makers **with a dated reason to buy now**, claim them with credits, and run paced LinkedIn outreach from your own account. Everything the dashboard does is also exposed over MCP, so Claude, Codex or Cursor can drive the whole pipeline.
 
-Everything is self-hosted: SQLite on your machine, a dashboard, and an MCP server so
-Claude Code, Codex, Cursor or any MCP client can drive it. No third-party account or
-paid API is required for the default sources.
+Signals show timing, not intent to buy. Every lead carries its source URL, a plain-language reason and the age of the evidence, so you can judge it yourself.
 
-## Workflow
+---
 
-1. **Company profile** — website, offer, buyer personas, role keywords, region,
-   exclusions. `generate_brief` can draft it from a website; you can also set it by hand.
-2. **Signals** — run one or more free sources over a target list:
-   - `public_scan` — job boards, news, tech checks, hiring volume (vendored MIT engine)
-   - `reddit` — public posts asking for recommendations / describing the problem
-   - `x`, `maps`, `facebook`, `reviews` — optional providers (see Configuration)
-3. **Explain** — every signal is scored as `weight × strength × 0.5^(age / half-life)`,
-   capped per type, with a source-diversity bonus. Each lead shows the signal in plain
-   words, how old it is, and its source.
-4. **Fit-check** — an LLM (or heuristic fallback) decides if the company is a plausible
-   buyer for the offer, with a confidence. Clear non-fits are dropped.
-5. **Dedupe + rank** — same domain+signal+date+summary is collapsed; accounts ranked.
-6. **Enrich** — LinkedIn search link always; email/phone if an enrichment adapter is set.
-7. **Outreach** — draft sequences, queue leads, and process with a sender:
-   `manual` (copy/paste), `webhook` (POST to `OUTREACH_WEBHOOK_URL`), or `linkedin`
-   (gated off — see below).
-8. **Credits** — each new lead records credits spent and the balance is tracked locally.
+## What it does
+
+| Stage | Behaviour |
+| --- | --- |
+| **Watchlist** | Paste a website → an ICP brief is built (from the page, or from what you paste) → a target list is created. |
+| **Signals** | Seven adapters collect dated evidence: company job boards, news, Reddit, X, Google Maps, Facebook pages, review feeds. |
+| **Qualification** | Signals are de-duplicated per real-world event, decayed by age, scored, and qualified with an LLM when one is configured (lexical heuristics otherwise — never a silent rejection). |
+| **Leads** | Ranked leads with reason, signal age, fit confidence and evidence timeline. Claim with credits or mark not-a-fit (the reason feeds back into qualification). |
+| **Outreach** | Campaigns + sequences rendered per lead from its own signal. Sending ramps 5→20/day with jitter, only on weekdays, only inside business hours, and pauses the moment a reply arrives. |
+| **Credits** | Append-only ledger. 10 free leads per workspace, then 1 credit per claim. Stripe top-ups in packs of 100 (idempotent webhooks). |
+| **Agents** | MCP server at `/mcp` (Streamable HTTP, per-tenant API key) with 13 tools mirroring the REST surface. |
+| **Audit** | Every claim, send, pause, key change and billing event is recorded with its actor. |
+
+---
+
+## Quick start
+
+```bash
+cp .env.example .env        # then set JWT_SECRET and SESSION_ENCRYPTION_KEY
+docker compose up -d --build
+docker compose run --rm api python scripts/seed.py   # demo workspace + leads
+```
+
+* Dashboard — http://localhost:3000 (`demo@letmelead.local` / `demo-password-123` after seeding)
+* API docs — http://localhost:8000/v1/docs
+* MCP endpoint — http://localhost:8765/mcp
+
+Without Docker:
+
+```bash
+make install                 # .venv + python deps + web deps
+make dev-api                 # needs Postgres and Redis (see .env)
+make dev-web
+```
+
+`DOMAIN=your.host docker compose --profile tls up -d` adds Caddy with automatic TLS; `--profile exports` adds MinIO for exports.
+
+---
 
 ## Architecture
 
 ```
-src/
-  index.ts            server entry (dashboard + MCP over HTTP)
-  web.ts              Express: REST API + Streamable-HTTP MCP at /mcp
-  config.ts           env loading
-  db.ts               SQLite schema + migrations (node:sqlite, no native deps)
-  store.ts            accounts, settings, leads, signals, campaigns, credits CRUD
-  scoring.ts          signal weights + time-decay ranking
-  llm.ts              optional OpenAI-compatible LLM calls
-  targets.ts          target list loading + exclusions
-  engine/
-    pipeline.ts       sources -> dedupe -> fit -> rank -> enrich -> upsert -> credits
-    signals.ts        thin wrapper over the pipeline (agent-facing)
-    fit.ts            AI fit-check + heuristic fallback
-    enrich.ts         LinkedIn search link + provider hook
-    outreach.ts       compose/queue/run outreach (manual, webhook, gated linkedin)
-    brief.ts          website -> company profile
-  sources/
-    index.ts          source registry + selection + status
-    publicScan.ts     runs the vendored Python engine
-    reddit.ts         public Reddit search
-    providers.ts      X, Google Maps, Facebook, reviews
-  mcp/
-    server.ts         MCP tool contract
-    stdio.ts          stdio entry for desktop agents
-public/index.html     dashboard
-vendor/buying-signal-scan/   vendored MIT signal engine (Python, stdlib only)
-data/targets.csv      example target list (company,domain,country) — replace it
-skill/SKILL.md        local agent skill for this tool
+                    ┌──────────────┐        ┌───────────────┐
+  browser ─────────▶│  web (3000)  │───────▶│   api (8000)  │
+  Claude/Codex ────▶│  MCP (8765)  │───────▶│   FastAPI     │
+                    └──────────────┘        └───────┬───────┘
+                                                    │
+                    ┌──────────────┐        ┌───────▼───────┐
+                    │ beat (cron)  │───────▶│ Postgres 16   │
+                    └──────┬───────┘        └───────────────┘
+                           │                ┌───────────────┐
+                    ┌──────▼───────┐        │   Redis 7     │
+                    │ worker       │───────▶└───────────────┘
+                    │ scans, send  │
+                    └──────────────┘
 ```
 
-## Requirements
+* **API** (`apps/api/letmelead`) — FastAPI, SQLAlchemy 2, Alembic. JWT or `X-API-Key`, role checks (owner/member/viewer), tenant scoping in every query, cursor pagination, `Idempotency-Key` replay storage, rate limiting, structured JSON logs, Sentry hook.
+* **Worker** (`apps/worker`) — Celery queues `scans`, `outreach`, `default`. Beat scans every 6h, processes active campaigns every 10 min, withdraws stale invitations daily, delivers webhooks every minute.
+* **Web** (`apps/web`) — Next.js 14 App Router, Tailwind, shadcn-style primitives, TanStack Query, dark mode, keyboard-accessible tables and forms.
+* **MCP** (`packages/mcp`) — same API underneath, so tools and REST can never disagree; `manifest.py` is contract-tested against the registered tools.
 
-- Node.js >= 22.5 (uses the built-in `node:sqlite`; tested on 24.x)
-- Python 3.9+ on PATH (for the vendored signal scan; stdlib only, no pip installs)
-- Network access for public signal sources
+Full detail: [docs/architecture.md](docs/architecture.md).
 
-## Run
+---
 
-```bash
-git clone https://github.com/paarthbhatt/LetMeLead.git
-cd LetMeLead
-npm install
-cp .env.example .env      # optional; add an LLM key and any provider keys
-npm start
+## Repository layout
+
+```
+apps/api          FastAPI app, models, services, routers, Alembic, tests
+apps/worker       Celery app + tasks (scan, outreach, webhooks, withdrawals)
+apps/web          Next.js dashboard
+packages/mcp      MCP server, API client, tool manifest, CLI client, tests
+infra             Dockerfiles, Caddyfile
+scripts           seed.py, smoke_api.py, linkedin_session.py
+docs              architecture, mcp, integrations, operations, compliance
+legacy            the earlier single-user prototype, kept for reference
 ```
 
-Open http://127.0.0.1:8787/
+---
 
-- `GET /health` — health check
-- `POST /mcp` — MCP Streamable HTTP endpoint
-- `GET/PUT /api/...` — dashboard REST API
+## Key API routes
 
-## Connect an agent (MCP)
+All under `/v1`. Auth: `Authorization: Bearer <jwt>` or `X-API-Key: <key>`; tenant from the token or `X-Tenant-Id`.
 
-**Desktop / stdio** (Claude Desktop, Codex, etc.):
-
-```bash
-npm run mcp:stdio
+```
+POST /auth/signup|login|refresh|logout      GET /auth/me, /auth/google
+GET|PATCH /tenant                           POST /tenant/onboarding
+GET|POST /tenant/members  /tenant/api-keys
+GET /sources  PATCH /sources/{id}  POST /sources/scan
+GET|POST /targets  POST /targets/import
+GET /leads  GET /leads/{id}  POST /leads/{id}/claim|not-fit
+GET|POST /campaigns  GET|PATCH /campaigns/{id}
+POST /campaigns/{id}/pause|resume|queue|send
+PUT  /campaigns/{id}/sequence  GET .../preview/{lead_id}  GET .../messages
+GET /replies  POST /replies/ingest  POST /replies/{id}/read  GET /replies/threads
+GET|POST /linkedin  POST /linkedin/connect|pause|resume  GET /linkedin/limits
+GET /credits  GET /credits/ledger  POST /orders/top-up  GET /orders /invoices
+GET|POST /webhooks  GET /audit  GET /health  GET /stats
 ```
 
-Point your MCP client at that command, e.g. a Claude Desktop config entry:
+Errors are a uniform envelope: `{"error": {"code", "message", "details", "request_id"}}`.
+
+---
+
+## MCP in one minute
 
 ```json
 {
   "mcpServers": {
     "letmelead": {
-      "command": "npx",
-      "args": ["tsx", "<path-to>/LetMeLead/src/mcp/stdio.ts"],
-      "cwd": "<path-to>/LetMeLead"
+      "type": "http",
+      "url": "http://localhost:8765/mcp",
+      "headers": { "Authorization": "Bearer lml_..." }
     }
   }
 }
 ```
 
-**Streamable HTTP**: register `http://127.0.0.1:8787/mcp`. If you set `LOCAL_MCP_KEY`
-in `.env`, send `Authorization: Bearer <key>`.
+Tools: `find_leads`, `list_leads`, `get_lead`, `claim_lead`, `mark_not_fit`, `create_campaign`, `pause_campaign`, `send_outreach`, `list_replies`, `get_credits`, `top_up`, `list_campaigns`, `preview_message`. See [docs/mcp.md](docs/mcp.md).
 
-Then paste the local skill (`skill/SKILL.md`) into your agent's skills folder, or just
-ask: *"Call get_setup_status, then find me leads for my company."*
+---
+
+## Development
+
+```bash
+make test        # pytest (30 tests: ledger, scoring, pacing, qualification, API flow, MCP contract)
+make lint        # ruff
+make typecheck   # tsc --noEmit
+make build       # next build
+make smoke       # end-to-end against a running API
+```
+
+Migrations: `make migrate`, `make revision m="..."`.
+
+---
 
 ## Configuration
 
-Copy `.env.example` to `.env`. Everything is optional:
+Everything is env-driven; see [.env.example](.env.example). Nothing is required to boot except a database and `JWT_SECRET`. Optional providers degrade explicitly:
 
-| Variable | Purpose |
-| --- | --- |
-| `PORT` | Dashboard/MCP port (default 8787) |
-| `DB_PATH` | SQLite file (default `./data/leads.db`) |
-| `LOCAL_MCP_KEY` | Optional bearer token for `/mcp` |
-| `LLM_BASE_URL` / `LLM_API_KEY` / `LLM_MODEL` | Any OpenAI-compatible endpoint for briefs, fit checks, sequences |
-| `X_BEARER_TOKEN` | X/Twitter source (paid X API; optional) |
-| `GOOGLE_MAPS_API_KEY` / `MAPS_QUERY` | Google Maps source |
-| `FB_ACCESS_TOKEN` / `FB_PAGE_IDS` | Facebook source |
-| `REVIEWS_FEED_URL` | JSON review feed source |
-| `PREDICTLEADS_*`, `FIRECRAWL_API_KEY`, `APIFY_TOKEN` | Optional providers used by the vendored engine |
-| `ENRICH_PROVIDER` / `ENRICH_API_KEY` | Email/phone enrichment adapter |
-| `OUTREACH_WEBHOOK_URL` | Webhook sender target |
-| `ENABLE_LINKEDIN_AUTOMATION` | Leave `false`; LinkedIn automation is gated |
+* **LLM** (`LLM_PROVIDER=openai|anthropic|ollama`) — better qualification, personalization and ICP extraction. Without it you get heuristics, and every affected record says so in its limitations.
+* **Enrichment** (`ENRICHMENT_PROVIDER=pattern`) — with no provider, leads carry a LinkedIn search link and an honest "unverified" contact instead of invented emails.
+* **Stripe** — without keys, top-up orders are recorded as pending so the ledger remains testable; with keys you get real Checkout sessions and signed webhooks.
+* **Outreach** — `OUTREACH_ENABLED=false` and `OUTREACH_DRY_RUN=true` by default: the worker renders and audits messages without sending.
 
-The default sources (`public_scan`, `reddit`) are free and need no keys. Everything
-else is opt-in.
+---
 
-## Company profile and target list
+## Status
 
-Set the profile from the dashboard or with `update_settings` / `generate_brief`:
-website, offer, buyers, roles, region, exclusions. This is what makes the tool work
-for *your* company or client — there are no built-in assumptions about an industry.
+Verified in this environment: Alembic migration, seed, `pytest` (30 passed), `ruff`, `tsc`, `next build`, a full REST acceptance run against a live API on Postgres-compatible storage, and a live MCP session (13 tools, authenticated tool calls, clean error envelopes).
 
-The pipeline scans `data/targets.csv` (or the path in `settings.target_list`, or targets
-passed directly). Columns: `company,domain,country` (plus optional
-`employer,news_query,careers_url`). Replace the example rows with your own ICP.
-
-To auto-discover accounts, wire a discovery source into `src/sources/` (a search API,
-Crunchbase, or a public directory). The pipeline is source-agnostic.
-
-## Attribution
-
-The vendored `vendor/buying-signal-scan/` engine and its scoring weights come from
-**Ekos Labs' MIT-licensed `buying-signal-scan` skill** (see `THIRD_PARTY.md` and the
-license file in that folder). LetMeLead is an independent project and is not affiliated
-with or endorsed by Ekos Labs.
-
-## What this deliberately does not do
-
-- **No LinkedIn automation.** LinkedIn's terms prohibit automated messaging and
-  scraping. The `linkedin` sender is gated behind `ENABLE_LINKEDIN_AUTOMATION=true`
-  and is not implemented; use `manual` or `webhook`.
-- **No scraping of third-party apps.** Public data sources only.
-- **No bypassing bot protection.** Blocked sites are reported, not worked around.
-- **No personal profiles.** Company-level public signals only.
-
-## Roadmap
-
-- Target discovery from the company profile (public search / directories).
-- Deeper enrichment adapters (LinkedIn, email, phone).
-- Scheduled scans (the vendored engine supports `state/` growth tracking).
+Not verified here: `docker compose up` itself (the sandbox cannot attach container networks) and live LinkedIn sending (needs Playwright + Chromium and one real session). Both paths are implemented and documented; see [docs/operations.md](docs/operations.md).

@@ -1,0 +1,149 @@
+# Local and single-VPS deployment. Copy .env.example to .env first.
+name: letmelead
+
+x-api-env: &api-env
+  env_file: [.env]
+  environment:
+    DATABASE_URL: postgresql+psycopg://letmelead:${POSTGRES_PASSWORD:-letmelead}@postgres:5432/letmelead
+    REDIS_URL: redis://redis:6379/0
+    API_BASE_URL: ${API_BASE_URL:-http://localhost:8000}
+    WEB_BASE_URL: ${WEB_BASE_URL:-http://localhost:3000}
+  depends_on:
+    postgres:
+      condition: service_healthy
+    redis:
+      condition: service_healthy
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: infra/Dockerfile.api
+      args:
+        INSTALL_PLAYWRIGHT: ${INSTALL_PLAYWRIGHT:-0}
+    <<: *api-env
+    command: >
+      sh -c "alembic -c apps/api/alembic.ini upgrade head &&
+             uvicorn letmelead.main:app --host 0.0.0.0 --port 8000 --proxy-headers"
+    ports: ["${API_PORT:-8000}:8000"]
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8000/v1/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 25s
+    restart: unless-stopped
+
+  mcp:
+    build:
+      context: .
+      dockerfile: infra/Dockerfile.api
+    <<: *api-env
+    environment:
+      LETMELEAD_API_URL: http://api:8000
+      MCP_PORT: 8765
+      MCP_TRANSPORT: http
+    command: letmelead-mcp
+    ports: ["${MCP_PORT:-8765}:8765"]
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8765/health"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    restart: unless-stopped
+
+  worker:
+    build:
+      context: .
+      dockerfile: infra/Dockerfile.api
+      args:
+        INSTALL_PLAYWRIGHT: ${INSTALL_PLAYWRIGHT:-0}
+    <<: *api-env
+    working_dir: /app/apps/worker
+    command: celery -A celery_app worker --loglevel=INFO -Q default,scans,outreach --concurrency=${WORKER_CONCURRENCY:-2}
+    restart: unless-stopped
+
+  beat:
+    build:
+      context: .
+      dockerfile: infra/Dockerfile.api
+    <<: *api-env
+    working_dir: /app/apps/worker
+    command: celery -A celery_app beat --loglevel=INFO
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: infra/Dockerfile.web
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+    environment:
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+    ports: ["${WEB_PORT:-3000}:3000"]
+    depends_on:
+      api:
+        condition: service_started
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: letmelead
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-letmelead}
+      POSTGRES_DB: letmelead
+    volumes: ["pgdata:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U letmelead -d letmelead"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes
+    volumes: ["redisdata:/data"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${S3_ACCESS_KEY:-letmelead}
+      MINIO_ROOT_PASSWORD: ${S3_SECRET_KEY:-letmelead-secret}
+    volumes: ["miniodata:/data"]
+    ports: ["${MINIO_PORT:-9000}:9000", "${MINIO_CONSOLE_PORT:-9001}:9001"]
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+    profiles: ["exports"]
+    restart: unless-stopped
+
+  caddy:
+    image: caddy:2-alpine
+    ports: ["80:80", "443:443"]
+    environment:
+      DOMAIN: ${DOMAIN:-localhost}
+    volumes:
+      - ./infra/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddydata:/data
+      - caddyconfig:/config
+    depends_on: [api, web]
+    profiles: ["tls"]
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  redisdata:
+  miniodata:
+  caddydata:
+  caddyconfig:
