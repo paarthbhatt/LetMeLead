@@ -5,7 +5,7 @@ COMPOSE ?= docker compose
 API_URL ?= http://localhost:8000
 
 .DEFAULT_GOAL := help
-.PHONY: help install up down logs ps migrate revision seed dev-api dev-web test lint typecheck build smoke reset-db
+.PHONY: help install up down logs ps migrate revision seed dev-api dev-web test lint typecheck webtest build smoke reset-db
 
 help: ## Show available targets
 	@grep -hE '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-14s\033[0m %s\n", $$1, $$2}'
@@ -55,6 +55,9 @@ lint: ## Ruff
 
 typecheck: ## TypeScript
 	cd apps/web && npm run typecheck
+
+webtest: ## Dashboard unit tests (vitest)
+	cd apps/web && npm run test
 
 build: ## Build the dashboard
 	cd apps/web && npm run build

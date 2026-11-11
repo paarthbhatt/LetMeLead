@@ -15,7 +15,7 @@ logger = logging.getLogger("letmelead.intent")
 
 PATTERNS: dict[str, re.Pattern[str]] = {
     "issue_experienced": re.compile(
-        r"\b(problem|issue|struggl|frustrat|fail(ed|ing)?|broken|bug|outage|downtime|slow|"
+        r"\b(problem|issue|struggl\w*|frustrat\w*|fail(ed|ing)?|broken|bug|outage|downtime|slow|"
         r"cannot|cant|can't|losing|hate|painful)\b",
         re.I,
     ),

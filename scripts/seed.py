@@ -15,6 +15,7 @@ sys.path.insert(0, str(API_DIR))
 
 from letmelead import credits, security  # noqa: E402
 from letmelead.db import SessionLocal  # noqa: E402
+from letmelead.deps import fingerprint as security_fingerprint  # noqa: E402
 from letmelead.models import (  # noqa: E402
     Campaign,
     Contact,
@@ -34,7 +35,7 @@ from letmelead.models import (  # noqa: E402
 from letmelead.services.pacing import schedule  # noqa: E402
 from sqlalchemy import select  # noqa: E402
 
-DEMO_EMAIL = os.getenv("SEED_EMAIL", "demo@letmelead.local")
+DEMO_EMAIL = os.getenv("SEED_EMAIL", "demo@letmelead.dev")
 DEMO_PASSWORD = os.getenv("SEED_PASSWORD", "demo-password-123")
 
 ICP = {
@@ -181,7 +182,9 @@ def _seed() -> None:
                     url=url,
                     published_at=published,
                     points=2.0,
-                    fingerprint=f"seed|{domain}|{signal_type}|{headline[:60]}",
+                    # Same sha1 scheme the engine uses, so seeded signals dedupe
+                    # against real ones and always fit the column.
+                    fingerprint=security_fingerprint(str(tenant.id), domain, signal_type, headline[:180]),
                     detail={"seeded": True},
                 )
                 db.add(signal_row)

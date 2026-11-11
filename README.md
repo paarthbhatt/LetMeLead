@@ -29,7 +29,7 @@ docker compose up -d --build
 docker compose run --rm api python scripts/seed.py   # demo workspace + leads
 ```
 
-* Dashboard — http://localhost:3000 (`demo@letmelead.local` / `demo-password-123` after seeding)
+* Dashboard — http://localhost:3000 (`demo@letmelead.dev` / `demo-password-123` after seeding)
 * API docs — http://localhost:8000/v1/docs
 * MCP endpoint — http://localhost:8765/mcp
 
@@ -132,10 +132,12 @@ Tools: `find_leads`, `list_leads`, `get_lead`, `claim_lead`, `mark_not_fit`, `cr
 ## Development
 
 ```bash
-make test        # pytest (30 tests: ledger, scoring, pacing, qualification, API flow, MCP contract)
+make test        # pytest (62 tests: ledger, scoring, pacing, qualification, intent, security,
+                 #   webhooks, rate limiting, API flow, MCP contract)
 make lint        # ruff
 make typecheck   # tsc --noEmit
 make build       # next build
+make webtest     # vitest (dashboard unit tests)
 make smoke       # end-to-end against a running API
 ```
 
@@ -156,6 +158,6 @@ Everything is env-driven; see [.env.example](.env.example). Nothing is required 
 
 ## Status
 
-Verified in this environment: Alembic migration, seed, `pytest` (30 passed), `ruff`, `tsc`, `next build`, a full REST acceptance run against a live API on Postgres-compatible storage, and a live MCP session (13 tools, authenticated tool calls, clean error envelopes).
+Verified in this environment: Alembic migration against real Postgres, seed (idempotent), `pytest` (62 passed, on SQLite and Postgres), `ruff`, `eslint`, `tsc`, `vitest` (dashboard), `next build`, a full REST acceptance run against a live API on Postgres-compatible storage, and a live MCP session (13 tools, authenticated tool calls, clean error envelopes).
 
 Not verified here: `docker compose up` itself (the sandbox cannot attach container networks) and live LinkedIn sending (needs Playwright + Chromium and one real session). Both paths are implemented and documented; see [docs/operations.md](docs/operations.md).

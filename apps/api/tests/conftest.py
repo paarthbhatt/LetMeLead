@@ -25,6 +25,9 @@ os.environ.update(
         "OUTREACH_DRY_RUN": "true",
         "OUTREACH_ENABLED": "false",
         "SESSION_ENCRYPTION_KEY": "",
+        # Pin the unreachable-Redis fallback so rate limiting is deterministic
+        # whether or not a live Redis happens to be listening on this machine.
+        "REDIS_URL": "redis://127.0.0.1:9/0",
     }
 )
 

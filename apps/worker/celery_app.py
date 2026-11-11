@@ -1,6 +1,6 @@
 """Celery application: queues, routes and the beat schedule.
 
-Worker/beat run as separate containers in Docker Compose (see infra/docker-compose.yml).
+Worker/beat run as separate containers in Docker Compose (see docker-compose.yml).
 """
 
 from __future__ import annotations
