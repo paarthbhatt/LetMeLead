@@ -139,10 +139,13 @@ make lint        # ruff
 make typecheck   # tsc --noEmit
 make build       # next build
 make webtest     # vitest (dashboard unit tests)
+make e2e         # Playwright: onboarding → claim → campaign → pause, in a real browser
 make smoke       # end-to-end against a running API
 ```
 
 Migrations: `make migrate`, `make revision m="..."`.
+
+The browser suite needs the seeded demo workspace and both servers running (`make dev-api`, `make dev-web` in two shells, plus Postgres and Redis). `make e2e` reopens any leads claimed by earlier runs first, so the journey is repeatable. Set `E2E_BASE_URL` to point Playwright at an app you started yourself; without it, Playwright reuses or starts `npm run dev` on port 3000. CI runs the same suite against the built app with a fresh database.
 
 ---
 

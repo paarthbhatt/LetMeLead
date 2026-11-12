@@ -5,7 +5,7 @@ COMPOSE ?= docker compose
 API_URL ?= http://localhost:8000
 
 .DEFAULT_GOAL := help
-.PHONY: help install up down logs ps migrate revision seed dev-api dev-web test lint typecheck webtest build smoke reset-db
+.PHONY: help install up down logs ps migrate revision seed dev-api dev-web test lint typecheck webtest build e2e smoke reset-db
 
 help: ## Show available targets
 	@grep -hE '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-14s\033[0m %s\n", $$1, $$2}'
@@ -61,6 +61,10 @@ webtest: ## Dashboard unit tests (vitest)
 
 build: ## Build the dashboard
 	cd apps/web && npm run build
+
+e2e: ## Browser journey: onboarding, claim, campaign start and pause (needs a seeded db, API on :8000 and web on :3000)
+	$(PY) scripts/seed_e2e.py
+	cd apps/web && npm run test:e2e
 
 smoke: ## End-to-end API smoke test against a running API
 	$(PY) scripts/smoke_api.py --base-url $(API_URL)

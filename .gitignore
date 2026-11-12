@@ -21,6 +21,11 @@ runs/
 *.db
 *.sqlite3
 
+# playwright
+apps/web/e2e/.auth/
+apps/web/playwright-report/
+apps/web/test-results/
+
 # logs and OS noise
 *.log
 .DS_Store

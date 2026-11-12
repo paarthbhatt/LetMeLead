@@ -9,7 +9,8 @@
     "start:standalone": "node .next/standalone/server.js",
     "typecheck": "tsc --noEmit",
     "lint": "next lint",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@fontsource-variable/manrope": "^5.3.0",
@@ -24,6 +25,7 @@
     "three": "0.187.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.65.0",
     "@testing-library/dom": "^10.4.2",
     "@testing-library/react": "^16.3.3",
     "@types/node": "^22.7.9",
