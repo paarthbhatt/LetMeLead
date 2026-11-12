@@ -9,6 +9,7 @@ __pycache__/
 # node / next
 node_modules/
 .next/
+.next-dev/
 out/
 *.tsbuildinfo
 
@@ -26,3 +27,14 @@ runs/
 
 # docker
 pgdata/
+# prowl-agent: derived state
+.prowl/index.db*
+.prowl/cache/
+.prowl/logs/
+.prowl/editor/
+.prowl/setup-applies.json
+.prowl-setup.lock
+# /prowl-agent: derived state
+
+# local prowl workspace state
+.prowl/

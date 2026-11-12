@@ -4,6 +4,7 @@
 **/__pycache__
 **/*.pyc
 **/.next
+**/.next-dev
 **/node_modules
 data
 runs

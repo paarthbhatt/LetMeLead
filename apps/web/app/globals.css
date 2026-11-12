@@ -4,60 +4,108 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222 47% 11%;
+    color-scheme: light;
+    --background: 220 20% 97%;
+    --foreground: 228 14% 14%;
     --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
-    --primary: 221 83% 53%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222 47% 11%;
-    --muted: 210 40% 96%;
-    --muted-foreground: 215 16% 47%;
-    --accent: 210 40% 96%;
-    --accent-foreground: 222 47% 11%;
-    --destructive: 0 72% 51%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 221 83% 53%;
-    --radius: 0.6rem;
+    --card-foreground: 228 14% 14%;
+    --sidebar: 220 16% 98%;
+    --surface: 220 17% 95%;
+    --signal: 223 78% 52%;
+    --primary: 228 14% 16%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 15% 93%;
+    --secondary-foreground: 228 14% 18%;
+    --muted: 220 16% 93%;
+    --muted-foreground: 225 9% 43%;
+    --accent: 228 14% 93%;
+    --accent-foreground: 228 14% 14%;
+    --destructive: 0 68% 45%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 15% 88%;
+    --input: 220 12% 81%;
+    --ring: 253 62% 52%;
+    --radius: 0.875rem;
+    --shadow-card: 0 1px 3px hsl(228 20% 10% / 0.035), 0 4px 16px hsl(228 20% 10% / 0.015);
   }
 
   .dark {
-    --background: 222 47% 7%;
-    --foreground: 210 40% 96%;
-    --card: 222 47% 10%;
-    --card-foreground: 210 40% 96%;
-    --primary: 217 91% 60%;
-    --primary-foreground: 222 47% 11%;
-    --secondary: 217 33% 17%;
-    --secondary-foreground: 210 40% 96%;
-    --muted: 217 33% 15%;
-    --muted-foreground: 215 20% 65%;
-    --accent: 217 33% 17%;
-    --accent-foreground: 210 40% 96%;
-    --destructive: 0 63% 45%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217 33% 20%;
-    --input: 217 33% 20%;
-    --ring: 217 91% 60%;
+    color-scheme: dark;
+    --background: 228 10% 9%;
+    --foreground: 220 12% 93%;
+    --card: 228 9% 12%;
+    --card-foreground: 220 12% 93%;
+    --sidebar: 228 11% 8%;
+    --surface: 228 9% 15%;
+    --signal: 223 90% 75%;
+    --primary: 220 13% 93%;
+    --primary-foreground: 228 12% 12%;
+    --secondary: 228 9% 19%;
+    --secondary-foreground: 220 12% 93%;
+    --muted: 228 9% 17%;
+    --muted-foreground: 225 8% 63%;
+    --accent: 228 9% 18%;
+    --accent-foreground: 220 12% 93%;
+    --destructive: 0 83% 70%;
+    --destructive-foreground: 0 0% 10%;
+    --border: 228 9% 21%;
+    --input: 228 9% 28%;
+    --ring: 253 85% 76%;
+    --shadow-card: 0 1px 2px hsl(0 0% 0% / 0.12), 0 4px 20px hsl(0 0% 0% / 0.05);
   }
 
   * {
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground antialiased;
+    @apply bg-background font-sans text-foreground antialiased;
+    min-width: 320px;
     font-feature-settings: "cv02", "cv03", "cv04";
+    text-rendering: optimizeLegibility;
+  }
+  ::selection {
+    background: hsl(var(--signal) / 0.2);
   }
   :focus-visible {
     @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+  input[type="checkbox"], input[type="radio"] {
+    accent-color: hsl(var(--signal));
+  }
+  input, textarea, select {
+    font: inherit;
+  }
+  kbd {
+    font-family: inherit;
   }
 }
 
 @layer components {
   .card {
-    @apply rounded-lg border bg-card text-card-foreground shadow-sm;
+    @apply rounded-xl border bg-card text-card-foreground;
+    box-shadow: var(--shadow-card);
+  }
+  .ui-table tbody tr {
+    transition: background-color 120ms ease;
+  }
+  .ui-table tbody tr:hover {
+    background-color: hsl(var(--surface) / 0.7);
+  }
+  .dialog-panel {
+    animation: dialog-enter 140ms ease-out;
+  }
+}
+
+@keyframes dialog-enter {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

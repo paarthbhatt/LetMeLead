@@ -1,0 +1,145 @@
+[
+  {
+    "id": "motion",
+    "repo": "motiondivision/ai-kit",
+    "commit": "1e424943582cbbdb6e3f410687e39f96451447bb",
+    "prefix": "plugins/motion/skills/motion/",
+    "source": "README.md",
+    "size": 3090,
+    "blob": "d09be67ce02b01e1c83ba925c897dfe2412776fd",
+    "sha256": "5e6347889383a68cef80885d8941827f566cd055c068cd512dc0ea2f9c6e25c3",
+    "installed": "UPSTREAM-README.md"
+  },
+  {
+    "id": "motion",
+    "repo": "motiondivision/ai-kit",
+    "commit": "1e424943582cbbdb6e3f410687e39f96451447bb",
+    "prefix": "plugins/motion/skills/motion/",
+    "source": "plugins/motion/skills/motion/SKILL.md",
+    "size": 5872,
+    "blob": "771460d07df6bfb2cb7d94b7d6ef3627efb13e61",
+    "sha256": "69f9fe4de5bd0618dd3578925e0f21df5ebb5161e2665ed2aa1ed55edef3be0f",
+    "installed": "SKILL.md"
+  },
+  {
+    "id": "motion",
+    "repo": "motiondivision/ai-kit",
+    "commit": "1e424943582cbbdb6e3f410687e39f96451447bb",
+    "prefix": "plugins/motion/skills/motion/",
+    "source": "plugins/motion/skills/motion/best-practices/base-ui.md",
+    "size": 2737,
+    "blob": "9a5f0144e102126f5983d26fa9b20c9eb77a5ff7",
+    "sha256": "cf1e79a446965c965a19a07e6c92527c8f661f87e0f16e321d4136fa7f1dd0de",
+    "installed": "best-practices/base-ui.md"
+  },
+  {
+    "id": "motion",
+    "repo": "motiondivision/ai-kit",
+    "commit": "1e424943582cbbdb6e3f410687e39f96451447bb",
+    "prefix": "plugins/motion/skills/motion/",
+    "source": "plugins/motion/skills/motion/best-practices/css-or-motion.md",
+    "size": 2320,
+    "blob": "b54192e31a8d920d8557b12fb264581ebe61d029",
+    "sha256": "7b5fa2e184238a0532d2b010629474e99dec36a5a35c442c12f96db5aa25682c",
+    "installed": "best-practices/css-or-motion.md"
+  },
+  {
+    "id": "motion",
+    "repo": "motiondivision/ai-kit",
+    "commit": "1e424943582cbbdb6e3f410687e39f96451447bb",
+    "prefix": "plugins/motion/skills/motion/",
+    "source": "plugins/motion/skills/motion/best-practices/index.md",
+    "size": 3936,
+    "blob": "e6b7206cc1923493749f76c149d0e52ebbb56a90",
+    "sha256": "78fccd242981414e395988b4965ae390af79edfbdf3d0f36b6cf8650733a0da9",
+    "installed": "best-practices/index.md"
+  },
+  {
+    "id": "motion",
+    "repo": "motiondivision/ai-kit",
+    "commit": "1e424943582cbbdb6e3f410687e39f96451447bb",
+    "prefix": "plugins/motion/skills/motion/",
+    "source": "plugins/motion/skills/motion/best-practices/motion.md",
+    "size": 947,
+    "blob": "d0b59c8d963ac002929bf1ad689f055a964cb23b",
+    "sha256": "92dee7c7b3d39ed02956102fbc0c9790e4f45a11b80bd5846a8336871b555d8a",
+    "installed": "best-practices/motion.md"
+  },
+  {
+    "id": "motion",
+    "repo": "motiondivision/ai-kit",
+    "commit": "1e424943582cbbdb6e3f410687e39f96451447bb",
+    "prefix": "plugins/motion/skills/motion/",
+    "source": "plugins/motion/skills/motion/best-practices/react.md",
+    "size": 4529,
+    "blob": "a568fa54da091349b0e8dbbe419418214fa511ec",
+    "sha256": "e09d96029eb64313f6887949805447807d300a36d13138a56b22b3525f2cc7c7",
+    "installed": "best-practices/react.md"
+  },
+  {
+    "id": "motion",
+    "repo": "motiondivision/ai-kit",
+    "commit": "1e424943582cbbdb6e3f410687e39f96451447bb",
+    "prefix": "plugins/motion/skills/motion/",
+    "source": "plugins/motion/skills/motion/best-practices/vue.md",
+    "size": 1354,
+    "blob": "94db1ca0139544e9357d3ce3e703a701167db507",
+    "sha256": "935e462042b5f02d086d680e757f29b5e0d3177781c3aab9cc3838eed88bd292",
+    "installed": "best-practices/vue.md"
+  },
+  {
+    "id": "motion",
+    "repo": "motiondivision/ai-kit",
+    "commit": "1e424943582cbbdb6e3f410687e39f96451447bb",
+    "prefix": "plugins/motion/skills/motion/",
+    "source": "plugins/motion/skills/motion/codex/index.md",
+    "size": 6333,
+    "blob": "79e2171ca97d9318bbe3054d12300facf909a210",
+    "sha256": "e8cd498864f0c744d872c9d28cc6b4ba84d12c63cbd92c2ae66e2717dbe12b88",
+    "installed": "codex/index.md"
+  },
+  {
+    "id": "motion",
+    "repo": "motiondivision/ai-kit",
+    "commit": "1e424943582cbbdb6e3f410687e39f96451447bb",
+    "prefix": "plugins/motion/skills/motion/",
+    "source": "plugins/motion/skills/motion/css-spring/index.md",
+    "size": 2545,
+    "blob": "a5c1e19425e986e1d4a5fca2ddf327333b91d9c9",
+    "sha256": "98ae2faa1c68b5d2527e1f6bb3d94a1fb0482d24099ad6f9c5cfcd3ebb430a85",
+    "installed": "css-spring/index.md"
+  },
+  {
+    "id": "motion",
+    "repo": "motiondivision/ai-kit",
+    "commit": "1e424943582cbbdb6e3f410687e39f96451447bb",
+    "prefix": "plugins/motion/skills/motion/",
+    "source": "plugins/motion/skills/motion/insert/index.md",
+    "size": 2988,
+    "blob": "6eb18ed2dfae096164f8b9d11017e54967c4f6a1",
+    "sha256": "5b7d1ddd05277eb6a1362fb2c4fd8a5d859839f6439183903dd9312c6ddf6913",
+    "installed": "insert/index.md"
+  },
+  {
+    "id": "motion",
+    "repo": "motiondivision/ai-kit",
+    "commit": "1e424943582cbbdb6e3f410687e39f96451447bb",
+    "prefix": "plugins/motion/skills/motion/",
+    "source": "plugins/motion/skills/motion/performance-audit/index.md",
+    "size": 2846,
+    "blob": "dc5e72274ac50d62b8dec23fc6fdd6eb156e357d",
+    "sha256": "830b18c038391f43f44f774f10edf8b1e15b0d935736665192074b279caa36c7",
+    "installed": "performance-audit/index.md"
+  },
+  {
+    "id": "motion",
+    "repo": "motiondivision/ai-kit",
+    "commit": "1e424943582cbbdb6e3f410687e39f96451447bb",
+    "prefix": "plugins/motion/skills/motion/",
+    "source": "plugins/motion/skills/motion/transition-preview/index.md",
+    "size": 2240,
+    "blob": "b647c555df0aab096a0d8fe9029636e9cbb9d5bb",
+    "sha256": "64962b3757518956e56599d31bea8f7bced604b4ab35a14e2e1cf3494aa87ace",
+    "installed": "transition-preview/index.md"
+  }
+]

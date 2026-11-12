@@ -1,15 +1,19 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
+import { ArrowRight, Loader2 } from "lucide-react";
 import { useState } from "react";
 
-import { api, API_URL, ApiError } from "@/lib/api";
+import { api } from "@/lib/api";
 import { saveTokens } from "@/lib/auth";
-import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Input, Label } from "@/components/ui";
+import { Button, Input, Label, Notice } from "@/components/ui";
+import { WelcomeAuthDivider, WelcomeAuthFrame, WelcomeGoogleSignIn, WelcomePasswordInput } from "@/components/welcome-auth";
+import { welcomeError } from "@/components/welcome-data";
 
 export default function LoginPage() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -17,75 +21,33 @@ export default function LoginPage() {
 
   async function submit(event: React.FormEvent) {
     event.preventDefault();
+    if (busy) return;
     setBusy(true);
     setError(null);
     try {
-      const tokens = await api.login({ email, password });
+      const tokens = await api.login({ email: email.trim(), password });
       saveTokens(tokens);
-      router.push("/leads");
+      queryClient.clear();
+      router.replace("/overview");
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Could not sign in.");
+      setError(welcomeError(err, "Could not sign in. Please try again."));
     } finally {
       setBusy(false);
     }
   }
 
   return (
-    <main className="grid min-h-screen place-items-center bg-muted/30 p-4">
-      <Card className="w-full max-w-sm">
-        <CardHeader>
-          <CardTitle>Sign in to LetMeLead</CardTitle>
-          <CardDescription>Buying-signal leads, with the evidence attached.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={submit} className="space-y-4">
-            <div className="space-y-1.5">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                autoComplete="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                autoComplete="current-password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-            {error ? (
-              <p role="alert" className="text-sm text-destructive">
-                {error}
-              </p>
-            ) : null}
-            <Button type="submit" className="w-full" disabled={busy}>
-              {busy ? "Signing in…" : "Sign in"}
-            </Button>
-          </form>
-
-          <a
-            className="mt-4 flex h-9 w-full items-center justify-center rounded-md border text-sm hover:bg-accent"
-            href={`${API_URL}/v1/auth/google`}
-          >
-            Continue with Google
-          </a>
-
-          <p className="mt-4 text-center text-sm text-muted-foreground">
-            No workspace?{" "}
-            <Link href="/signup" className="text-foreground underline-offset-4 hover:underline">
-              Create one
-            </Link>
-          </p>
-        </CardContent>
-      </Card>
-    </main>
+    <WelcomeAuthFrame mode="login" title="Welcome back." description="Pick up your pipeline, review fresh signals, and keep the right conversations moving.">
+      <WelcomeGoogleSignIn disabled={busy} />
+      <WelcomeAuthDivider />
+      <form onSubmit={submit} className="space-y-5" aria-busy={busy} aria-describedby={error ? "login-error" : undefined}>
+        <fieldset disabled={busy} className="space-y-5">
+          <div className="space-y-2"><Label htmlFor="email">Email address</Label><Input id="email" type="email" autoComplete="email" placeholder="you@company.com" required value={email} onChange={(event) => setEmail(event.target.value)} className="h-11" /></div>
+          <div className="space-y-2"><Label htmlFor="password">Password</Label><WelcomePasswordInput id="password" autoComplete="current-password" required value={password} onChange={(event) => setPassword(event.target.value)} disabled={busy} /></div>
+        </fieldset>
+        {error ? <div id="login-error"><Notice tone="error" className="rounded-xl text-xs leading-5">{error}</Notice></div> : null}
+        <Button type="submit" className="h-11 w-full rounded-xl" disabled={busy}>{busy ? <><Loader2 className="size-4 animate-spin motion-reduce:animate-none" aria-hidden />Signing in…</> : <>Sign in<ArrowRight className="size-4" aria-hidden /></>}</Button>
+      </form>
+    </WelcomeAuthFrame>
   );
 }

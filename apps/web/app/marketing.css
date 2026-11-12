@@ -1,0 +1,649 @@
+/*
+  Marketing surface tokens. Scoped to .mkt-root so the dashboard theme
+  (which is dark by default) never leaks into the public pages.
+*/
+.mkt-root {
+  --mkt-paper: #f4f6fa;
+  --mkt-paper-deep: #eceff6;
+  --mkt-panel: #ffffff;
+  --mkt-ink: #15171c;
+  --mkt-ink-soft: #2b303a;
+  --mkt-muted: #596371;
+  --mkt-faint: #7b8492;
+  --mkt-line: #dce2eb;
+  --mkt-line-soft: #e7ebf2;
+  --mkt-blue: #355cb3;
+  --mkt-blue-bright: #517be8;
+  --mkt-blue-wash: #eef2fc;
+  --mkt-amber: #a3711f;
+  --mkt-amber-wash: #fbf3e4;
+  --mkt-green: #2f6b4f;
+  --mkt-radius: 14px;
+
+  color-scheme: light;
+  background: var(--mkt-paper);
+  color: var(--mkt-ink);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: "cv02", "cv03", "cv04";
+}
+
+.mkt-root ::selection {
+  background: rgb(81 123 232 / 18%);
+}
+
+/* Keep the specificity at zero so component buttons always win on colour. */
+:where(.mkt-root) a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.mkt-root :focus-visible {
+  outline: 2px solid var(--mkt-blue-bright);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.mkt-wrap {
+  width: min(100% - 48px, 1160px);
+  margin-inline: auto;
+}
+
+@media (max-width: 640px) {
+  .mkt-wrap {
+    width: min(100% - 32px, 1160px);
+  }
+}
+
+/* ---------- header ---------- */
+
+.mkt-header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  border-bottom: 1px solid transparent;
+  background: rgb(244 246 250 / 82%);
+  backdrop-filter: blur(14px) saturate(140%);
+  transition: border-color 160ms ease;
+}
+
+.mkt-header[data-scrolled="true"] {
+  border-bottom-color: var(--mkt-line);
+}
+
+.mkt-header-inner {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  height: 64px;
+}
+
+.mkt-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  white-space: nowrap;
+}
+
+.mkt-brand-mark {
+  display: grid;
+  grid-template-columns: repeat(3, 4px);
+  align-items: end;
+  gap: 3px;
+  height: 16px;
+}
+
+.mkt-brand-mark span {
+  border-radius: 1px;
+  background: var(--mkt-blue-bright);
+}
+
+.mkt-brand-mark span:nth-child(1) {
+  height: 7px;
+  opacity: 0.45;
+}
+.mkt-brand-mark span:nth-child(2) {
+  height: 11px;
+  opacity: 0.7;
+}
+.mkt-brand-mark span:nth-child(3) {
+  height: 16px;
+}
+
+.mkt-nav {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-left: 8px;
+  font-size: 13.5px;
+  color: var(--mkt-muted);
+}
+
+.mkt-nav a {
+  padding-block: 4px;
+  border-bottom: 1px solid transparent;
+  transition: color 120ms ease, border-color 120ms ease;
+}
+
+.mkt-nav a:hover {
+  color: var(--mkt-ink);
+  border-bottom-color: var(--mkt-line);
+}
+
+.mkt-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.mkt-skip {
+  position: absolute;
+  left: 16px;
+  top: -48px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: var(--mkt-ink);
+  color: #fff !important;
+  font-size: 13px;
+  transition: top 120ms ease;
+}
+
+.mkt-skip:focus {
+  top: 10px;
+}
+
+/* ---------- buttons ---------- */
+
+.mkt-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 38px;
+  padding-inline: 16px;
+  border: 1px solid var(--mkt-line);
+  border-radius: 9px;
+  background: var(--mkt-panel);
+  color: var(--mkt-ink);
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  transition: background 130ms ease, border-color 130ms ease, transform 130ms ease;
+}
+
+.mkt-btn:hover {
+  border-color: #c6cede;
+  background: #fbfcfe;
+}
+
+.mkt-btn:active {
+  transform: translateY(1px);
+}
+
+.mkt-btn[data-tone="solid"] {
+  border-color: var(--mkt-ink);
+  background: var(--mkt-ink);
+  color: #fff;
+}
+
+.mkt-btn[data-tone="solid"]:hover {
+  background: #23262e;
+  border-color: #23262e;
+}
+
+.mkt-btn[data-tone="quiet"] {
+  border-color: transparent;
+  background: transparent;
+  color: var(--mkt-muted);
+}
+
+.mkt-btn[data-tone="quiet"]:hover {
+  background: rgb(21 23 28 / 4%);
+  color: var(--mkt-ink);
+}
+
+.mkt-btn[data-size="lg"] {
+  height: 46px;
+  padding-inline: 22px;
+  font-size: 14.5px;
+  border-radius: 10px;
+}
+
+.mkt-btn[data-size="sm"] {
+  height: 32px;
+  padding-inline: 12px;
+  font-size: 12.5px;
+}
+
+/* ---------- type helpers ---------- */
+
+.mkt-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: var(--mkt-muted);
+  font-size: 11.5px;
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.mkt-eyebrow::before {
+  content: "";
+  width: 14px;
+  height: 1px;
+  background: var(--mkt-blue-bright);
+}
+
+.mkt-section {
+  padding-block: clamp(56px, 7vw, 96px);
+  border-top: 1px solid var(--mkt-line-soft);
+  scroll-margin-top: 80px;
+}
+
+.mkt-h2 {
+  margin: 12px 0 0;
+  font-size: clamp(26px, 3.4vw, 36px);
+  font-weight: 660;
+  line-height: 1.14;
+  letter-spacing: -0.042em;
+  text-wrap: balance;
+}
+
+.mkt-lede {
+  max-width: 62ch;
+  margin: 14px 0 0;
+  color: var(--mkt-muted);
+  font-size: 15.5px;
+  line-height: 1.68;
+  text-wrap: pretty;
+}
+
+.mkt-small {
+  color: var(--mkt-faint);
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+
+/* ---------- hero ---------- */
+
+.mkt-hero {
+  padding-block: clamp(44px, 5.4vw, 76px) clamp(36px, 4vw, 56px);
+}
+
+.mkt-hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.94fr);
+  gap: clamp(28px, 4vw, 56px);
+  align-items: start;
+}
+
+.mkt-hero h1 {
+  max-width: 15ch;
+  margin: 18px 0 0;
+  font-size: clamp(38px, 5.6vw, 66px);
+  font-weight: 680;
+  line-height: 1.02;
+  letter-spacing: -0.05em;
+  text-wrap: balance;
+}
+
+.mkt-hero h1 em {
+  font-style: normal;
+  color: var(--mkt-blue);
+}
+
+.mkt-hero-lede {
+  max-width: 46ch;
+  margin: 20px 0 0;
+  color: var(--mkt-muted);
+  font-size: clamp(15px, 1.15vw, 17px);
+  line-height: 1.66;
+  text-wrap: pretty;
+}
+
+.mkt-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 26px;
+}
+
+.mkt-hero-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 22px;
+  margin: 30px 0 0;
+  padding: 16px 0 0;
+  border-top: 1px solid var(--mkt-line-soft);
+  list-style: none;
+  color: var(--mkt-muted);
+  font-size: 12.5px;
+}
+
+.mkt-hero-facts li {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.mkt-hero-facts strong {
+  color: var(--mkt-ink);
+  font-size: 13px;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 900px) {
+  .mkt-hero-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .mkt-hero h1 {
+    max-width: 20ch;
+  }
+}
+
+/* Mobile menu: a native disclosure so the header stays one row without JS. */
+.mkt-mobile {
+  display: none;
+  position: relative;
+  margin-left: auto;
+}
+
+.mkt-mobile summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 36px;
+  padding-inline: 13px;
+  border: 1px solid var(--mkt-line);
+  border-radius: 9px;
+  background: var(--mkt-panel);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  list-style: none;
+}
+
+.mkt-mobile summary::-webkit-details-marker {
+  display: none;
+}
+
+.mkt-mobile summary::after {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-right: 1.5px solid currentcolor;
+  border-bottom: 1.5px solid currentcolor;
+  transform: translateY(-2px) rotate(45deg);
+}
+
+.mkt-mobile[open] summary::after {
+  transform: translateY(1px) rotate(-135deg);
+}
+
+.mkt-mobile-panel {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  display: grid;
+  gap: 2px;
+  min-width: 232px;
+  padding: 8px;
+  border: 1px solid var(--mkt-line);
+  border-radius: 12px;
+  background: var(--mkt-panel);
+  box-shadow: 0 16px 40px -18px rgb(21 23 28 / 28%);
+}
+
+.mkt-mobile-panel a {
+  padding: 9px 10px;
+  border-radius: 7px;
+  font-size: 13.5px;
+  color: var(--mkt-ink-soft);
+}
+
+.mkt-mobile-panel a:hover {
+  background: var(--mkt-blue-wash);
+}
+
+.mkt-mobile-panel a[data-tone="solid"] {
+  margin-top: 4px;
+  background: var(--mkt-ink);
+  color: #fff;
+  text-align: center;
+  font-weight: 600;
+}
+
+.mkt-mobile-panel a[data-tone="solid"]:hover {
+  background: #23262e;
+}
+
+@media (max-width: 880px) {
+  .mkt-nav,
+  .mkt-header-actions {
+    display: none;
+  }
+  .mkt-mobile {
+    display: block;
+  }
+  .mkt-header-inner {
+    gap: 12px;
+  }
+}
+
+/* ---------- hero instrument ---------- */
+
+.mkt-instrument {
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid var(--mkt-line);
+  border-radius: var(--mkt-radius);
+  background: var(--mkt-panel);
+  box-shadow: 0 1px 2px rgb(21 23 28 / 4%), 0 18px 48px -28px rgb(21 23 28 / 22%);
+}
+
+.mkt-instrument-controls {
+  display: grid;
+  gap: 12px;
+  padding: 14px 16px 16px;
+  border-top: 1px solid var(--mkt-line-soft);
+  background: linear-gradient(180deg, #fbfcfe, #f7f9fc);
+}
+
+.mkt-stages {
+  display: flex;
+  gap: 4px;
+  padding: 3px;
+  border: 1px solid var(--mkt-line);
+  border-radius: 9px;
+  background: var(--mkt-panel);
+}
+
+.mkt-stage {
+  display: inline-flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  height: 30px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--mkt-muted);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 130ms ease, color 130ms ease;
+}
+
+.mkt-stage:hover {
+  color: var(--mkt-ink);
+  background: rgb(21 23 28 / 4%);
+}
+
+.mkt-stage[data-active="true"] {
+  background: var(--mkt-ink);
+  color: #fff;
+}
+
+.mkt-stage-index {
+  display: grid;
+  place-items: center;
+  width: 15px;
+  height: 15px;
+  border: 1px solid currentcolor;
+  border-radius: 50%;
+  font-size: 9.5px;
+  font-weight: 700;
+  opacity: 0.55;
+}
+
+.mkt-stage[data-active="true"] .mkt-stage-index {
+  opacity: 0.85;
+}
+
+.mkt-instrument-note {
+  margin: 0;
+  min-height: 4.6em;
+  color: var(--mkt-muted);
+  font-size: 12.5px;
+  line-height: 1.58;
+  text-wrap: pretty;
+}
+
+@media (max-width: 620px) {
+  .mkt-instrument-note {
+    min-height: 0;
+  }
+  .mkt-stage {
+    font-size: 11.5px;
+  }
+}
+
+/* ---------- pricing ---------- */
+
+.mkt-pricing-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  gap: clamp(28px, 4vw, 64px);
+  align-items: start;
+}
+
+.mkt-pricing .mkt-lede {
+  max-width: 54ch;
+}
+
+.mkt-pricing .mkt-small {
+  max-width: 52ch;
+  margin-top: 14px;
+}
+
+.mkt-price-list {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  border-top: 1px solid var(--mkt-line);
+}
+
+.mkt-price-list > div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px 20px;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--mkt-line);
+}
+
+.mkt-price-list dt {
+  color: var(--mkt-muted);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.mkt-price-list dd {
+  grid-row: span 2;
+  margin: 0;
+  text-align: right;
+  color: var(--mkt-ink);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.mkt-price-list dd strong {
+  display: block;
+  font-size: 26px;
+  font-weight: 660;
+  line-height: 1.1;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+}
+
+.mkt-price-list p {
+  margin: 0;
+  max-width: 34ch;
+  color: var(--mkt-faint);
+  font-size: 12.5px;
+  line-height: 1.55;
+}
+
+@media (max-width: 860px) {
+  .mkt-pricing-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ---------- footer ---------- */
+
+.mkt-footer {
+  border-top: 1px solid var(--mkt-line);
+  padding-block: 40px 44px;
+  color: var(--mkt-muted);
+  font-size: 13px;
+}
+
+.mkt-footer-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 28px;
+}
+
+.mkt-footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 22px;
+}
+
+.mkt-footer a:hover {
+  color: var(--mkt-ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.mkt-footer-note {
+  max-width: 46ch;
+  margin: 22px 0 0;
+  color: var(--mkt-faint);
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mkt-root *,
+  .mkt-root *::before,
+  .mkt-root *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

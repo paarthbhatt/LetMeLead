@@ -6,7 +6,11 @@ const config: Config = {
   theme: {
     container: { center: true, padding: "1.5rem", screens: { "2xl": "1280px" } },
     extend: {
+      fontFamily: { sans: ["Manrope Variable", "Manrope", "sans-serif"] },
       colors: {
+        signal: "hsl(var(--signal))",
+        sidebar: "hsl(var(--sidebar))",
+        surface: "hsl(var(--surface))",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",

@@ -3,6 +3,7 @@
 import { clearSession, getSession, saveTokens } from "./auth";
 
 export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+export const MCP_URL = process.env.NEXT_PUBLIC_MCP_URL ?? "http://localhost:8765/mcp";
 
 export class ApiError extends Error {
   status: number;
@@ -65,6 +66,8 @@ export async function request<T>(path: string, options: Options = {}, retried = 
 }
 
 export const api = {
+  health: () => request<Health>("/v1/health"),
+  stats: () => request<{ signals_7d: number; replies_unread: number }>("/v1/stats"),
   signup: (body: { email: string; password: string; name?: string; company_name?: string }) =>
     request<{ access_token: string; refresh_token: string }>("/v1/auth/signup", { method: "POST", body }),
   login: (body: { email: string; password: string }) =>
@@ -199,6 +202,18 @@ export const api = {
 };
 
 export type Page<T> = { items: T[]; next_cursor: string | null };
+export type Health = {
+  status: string;
+  version: string;
+  providers: {
+    llm: string;
+    enrichment: string;
+    stripe: boolean;
+    google_oauth: boolean;
+    outreach_enabled: boolean;
+    outreach_dry_run: boolean;
+  };
+};
 export type Member = { id: string; user_id: string; email: string; name: string | null; role: string };
 export type ApiKey = { id: string; name: string; prefix: string; last_used_at: string | null; created_at: string };
 export type Source = {

@@ -1,0 +1,30 @@
+{
+  "mcp": {
+    "servers": {
+      "lml-docs": {
+        "type": "remote",
+        "url": "https://mcp.context7.com/mcp"
+      },
+      "lml-motion": {
+        "type": "remote",
+        "url": "https://mcp.motion.dev/"
+      },
+      "lml-browser": {
+        "type": "local",
+        "command": [
+          "npx",
+          "-y",
+          "@playwright/mcp@latest",
+          "--headless",
+          "--isolated",
+          "--browser",
+          "chrome",
+          "--executable-path",
+          "/usr/bin/chromium",
+          "--output-dir",
+          "/tmp/opencode/lml-browser"
+        ]
+      }
+    }
+  }
+}
