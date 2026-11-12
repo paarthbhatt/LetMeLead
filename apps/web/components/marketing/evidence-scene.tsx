@@ -128,7 +128,7 @@ export function EvidenceScene({ stage = 0, className }: EvidenceSceneProps) {
       aria-label={`${meta.label} stage of the evidence sorter. Drag with a pointer to rotate, or use the arrow keys to nudge the view.`}
       aria-describedby={hintId}
     >
-      <div className={styles.posterLayer}>
+      <div className={styles.posterLayer} aria-hidden={enhanced || undefined}>
         <ScenePoster stage={activeStage} />
       </div>
 

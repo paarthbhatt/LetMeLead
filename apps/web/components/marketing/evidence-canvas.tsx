@@ -291,18 +291,21 @@ async function createRenderer(
 
   if (typeof navigator !== "undefined" && "gpu" in navigator) {
     const gpuCanvas = createCanvas();
+    let gpuRenderer: WebGPURendererType | null = null;
     try {
       const { WebGPURenderer } = await import("three/webgpu");
-      const renderer = new WebGPURenderer({
+      gpuRenderer = new WebGPURenderer({
         canvas: gpuCanvas,
         antialias: true,
         alpha: true,
         powerPreference: "high-performance",
       });
-      await renderer.init();
-      return { renderer, webgpu: true, canvas: gpuCanvas };
+      await gpuRenderer.init();
+      return { renderer: gpuRenderer, webgpu: true, canvas: gpuCanvas };
     } catch {
-      // No adapter, blocked GPU or an unsupported device: use the WebGL path.
+      // No adapter, blocked GPU or an unsupported device: release whatever the
+      // half-built renderer already allocated, then use the WebGL path.
+      await disposeRenderer(gpuRenderer);
       gpuCanvas.remove();
     }
   }
@@ -570,7 +573,8 @@ export async function mountEvidenceCanvas(
       trackGeometry(new THREE.PlaneGeometry(0.05, 0.48)),
       trackMaterial(new THREE.MeshBasicMaterial({ color: COLORS.blue })),
     );
-    dossierAccent.position.set(-0.98, 0.66, 0.02);    panelGroup.add(dossierAccent);
+    dossierAccent.position.set(-0.98, 0.66, 0.02);
+    panelGroup.add(dossierAccent);
 
     const headerTexture = trackTexture(makeDossierTexture());
     const headerMaterial = trackMaterial(
@@ -603,7 +607,9 @@ export async function mountEvidenceCanvas(
     for (let index = 0; index < fields.length; index += 1) {
       const fieldTexture = trackTexture(makeCapsTexture(fields[index], "#5b6675"));
       const field = new THREE.Mesh(
-        trackGeometry(new THREE.PlaneGeometry(0.46, 0.1)),
+        // Keeps the 320x128 caps texture at its own 2.5:1 aspect so the labels
+        // are not stretched horizontally.
+        trackGeometry(new THREE.PlaneGeometry(0.25, 0.1)),
         trackMaterial(
           new THREE.MeshBasicMaterial({
             map: fieldTexture,
