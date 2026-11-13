@@ -1,12 +1,13 @@
 import * as React from "react";
 
 import { FooterSessionLink, HeaderActions } from "./header-actions";
+import { ScrollProgress } from "./scroll-progress";
+import { SiteThemeScript, SiteThemeToggle } from "./site-theme";
 
 const NAV = [
   { href: "/how-it-works", label: "How it works" },
   { href: "/#demo", label: "Sample lead" },
-  { href: "/integrations", label: "Integrations" },
-  { href: "/trust", label: "Trust" },
+  { href: "/#pricing", label: "Pricing" },
 ];
 
 export function Brand() {
@@ -37,6 +38,7 @@ export function MarketingHeader() {
             </a>
           ))}
         </nav>
+        <SiteThemeToggle className="mkt-theme-toggle" />
         <div className="mkt-header-actions">
           <HeaderActions />
         </div>
@@ -73,8 +75,7 @@ export function MarketingFooter() {
           </div>
           <nav className="mkt-footer-links" aria-label="Footer">
             <a href="/how-it-works">How it works</a>
-            <a href="/integrations">Integrations</a>
-            <a href="/trust">Trust &amp; data</a>
+            <a href="/#pricing">Pricing</a>
             <a href="/signup">Create workspace</a>
             <FooterSessionLink />
           </nav>
@@ -92,6 +93,8 @@ export function MarketingFooter() {
 export function MarketingShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="mkt-root">
+      <SiteThemeScript />
+      <ScrollProgress />
       <MarketingHeader />
       <main id="main">{children}</main>
       <MarketingFooter />
