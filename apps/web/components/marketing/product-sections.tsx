@@ -1,143 +1,62 @@
 import Link from "next/link";
 import * as React from "react";
 
+import { PipelineDiagram } from "./pipeline-diagram";
 import styles from "./sections-styles.module.css";
 
-export type SignalStatus = "live" | "partly_live" | "by_hand";
-
-export const SIGNAL_TOTALS = {
-  signals: 51,
-  categories: 8,
-  live: 8,
-  partlyLive: 21,
-  byHand: 22,
-} as const;
-
 export const SIGNAL_CATEGORIES = [
-  { name: "Asking now", count: 8 },
-  { name: "Hiring", count: 11 },
-  { name: "New leaders", count: 6 },
-  { name: "Growing", count: 8 },
-  { name: "Website and tools", count: 7 },
-  { name: "Events", count: 3 },
-  { name: "Local businesses", count: 5 },
-  { name: "Already knows you", count: 3 },
+  { name: "Asking now", blurb: "Someone describing the problem in public" },
+  { name: "Hiring", blurb: "A role that signals a new priority" },
+  { name: "New leaders", blurb: "A first ninety days with a budget" },
+  { name: "Growing", blurb: "Funding, expansion, a new market" },
+  { name: "Website and tools", blurb: "A stack that just changed" },
+  { name: "Events", blurb: "A room your buyer will be in" },
+  { name: "Local businesses", blurb: "A location with a real reason" },
+  { name: "Already knows you", blurb: "Warm, and easy to miss" },
 ] as const;
-
-export const SOURCE_ADAPTERS: readonly {
-  name: string;
-  status: Exclude<SignalStatus, "by_hand">;
-  statusLabel: string;
-  looksFor: string;
-  needs: string;
-}[] = [
-  {
-    name: "Company news",
-    status: "live",
-    statusLabel: "Live",
-    looksFor: "Funding, acquisitions, leadership changes, launches and relocations.",
-    needs: "Public Google News RSS. No key.",
-  },
-  {
-    name: "Job boards",
-    status: "live",
-    statusLabel: "Live",
-    looksFor: "Roles on a company's own careers page, including sales, marketing, success and SDR.",
-    needs: "A detected Greenhouse, Lever, Ashby or Personio board. No key.",
-  },
-  {
-    name: "Reddit",
-    status: "partly_live",
-    statusLabel: "Partly live",
-    looksFor: "Problem posts, alternative requests and competitor complaints.",
-    needs: "Public search JSON. Best-effort; a block is reported, never bypassed.",
-  },
-  {
-    name: "X / Twitter",
-    status: "partly_live",
-    statusLabel: "Partly live",
-    looksFor: "Company-named posts about switching, problems and migrations.",
-    needs: "X_BEARER_TOKEN. Official API v2 only.",
-  },
-  {
-    name: "Google Maps",
-    status: "partly_live",
-    statusLabel: "Partly live",
-    looksFor: "Local listings that match the Maps query you configure.",
-    needs: "GOOGLE_MAPS_API_KEY and MAPS_QUERY.",
-  },
-  {
-    name: "Facebook pages",
-    status: "partly_live",
-    statusLabel: "Partly live",
-    looksFor: "Posts from the pages you explicitly list.",
-    needs: "FB_ACCESS_TOKEN and FB_PAGE_IDS.",
-  },
-  {
-    name: "Review feeds",
-    status: "partly_live",
-    statusLabel: "Partly live",
-    looksFor: "Low-rating review items, three stars or less, from a feed you supply.",
-    needs: "REVIEWS_FEED_URL returning a JSON array.",
-  },
-];
 
 export const FAQ_ITEMS = [
   {
-    question: "Does LetMeLead send messages automatically?",
+    question: "Does it message people for me?",
     answer:
-      "No. Sending is off and dry-run is on by default. The worker renders and audits messages without sending until you enable live outreach. When live sending is on, it still runs only from a campaign you queued and a LinkedIn session you connected.",
+      "Only if you turn it on. Sending is off and preview-only when a workspace is created. When you enable outreach it runs from your own LinkedIn account, paced like a person, inside business hours, and it stops the moment someone replies. Nothing is claimed, sent or charged on your behalf before that.",
   },
   {
-    question: "Does scanning spend credits?",
+    question: "What does it cost?",
     answer:
-      "No. A scan does not spend credits. Each workspace gets 10 free claims, then a claim costs 1 credit. A 100-credit pack is USD 49 by default, and the server can configure another pack size or price. The ledger is append-only.",
+      "The first 10 leads are free and need no card. After that, one credit claims one lead, and 100 credits cost $49 — about 49 cents a lead. Reading, filtering and rescanning cost nothing. Credits do not expire and there is no subscription.",
   },
   {
-    question: "How many signals are there, and how many are automatic?",
+    question: "What do I actually get?",
     answer:
-      "The catalog contains 51 signals in 8 categories: 8 live, 21 partly live and 22 by hand. Only signals backed by an adapter can be toggled. By-hand signals cannot be switched on because there is no automatic collector behind the switch yet.",
+      "A short case file per lead: the reason in one sentence, the source and its date, how old the clue is, why the company matches what you sell, the person's role, and a message written from that clue. Enough to decide in under a minute and enough to defend the decision to a colleague.",
   },
   {
-    question: "Are contact names and emails verified?",
+    question: "Are the emails and phone numbers verified?",
     answer:
-      "Not by default. Names are recorded only when a source states them. Email addresses and phone numbers are stored only when an enrichment provider returns them, with the provider and confidence recorded. Without a provider, a lead carries a LinkedIn search link and an unverified label rather than an invented address.",
+      "Not by default, and we will not pretend otherwise. Names appear only when a public source states them. Email and phone appear only when an enrichment provider returned them. Without one, a lead carries a role, a profile link and an unverified label rather than an invented address.",
   },
   {
-    question: "Which sources run without extra keys?",
+    question: "Where does the evidence come from?",
     answer:
-      "News, job boards and Reddit are on for a new workspace. X needs X_BEARER_TOKEN, Google Maps needs a Places key and a query, Facebook needs a page token and page ids, and review feeds need a JSON feed URL. A source with missing credentials is reported as unavailable, and the rest of the scan still runs.",
+      "Public material: company news and careers pages, discussion forums, review sites, local listings and social pages. Coverage varies by company, region and category, and some sources are unavailable in some markets. A quiet company can produce nothing this week; that is a real answer, not a failure to hide.",
   },
   {
-    question: "What does “by hand” actually mean?",
+    question: "What if a lead is wrong for me?",
     answer:
-      "It means not automated. The evidence for those 22 signals is assembled outside the automatic adapters, by you or your team. There is no staffed-research promise and no queue behind the switch.",
+      "Mark it not a fit. It leaves your queue, your note stays on the record, and the reason informs the next round of matches. You are never asked to defend a lead you did not want.",
   },
   {
-    question: "Can I use my own model and enrichment keys?",
+    question: "Can my own agent use it?",
     answer:
-      "Yes. LLM_PROVIDER accepts openai, anthropic, ollama or none, with your base URL, key and model. ENRICHMENT_PROVIDER is none or pattern; the pattern provider returns a search link and marks the contact unverified. Another provider can be added behind the enrichment interface.",
+      "Yes. The same leads, credits and approvals are available to Claude, Codex, Cursor or your own automation, under your workspace and your permissions. An agent still cannot claim a lead or send a message without your explicit approval.",
   },
   {
-    question: "Can Claude, Codex or Cursor drive the whole pipeline?",
+    question: "Will it work in a narrow market?",
     answer:
-      "They can use the MCP server at /mcp, which exposes 13 tools over the same REST API, tenant, credits and audit. The server instructions tell a model not to claim a lead or send outreach without your explicit approval.",
+      "Sometimes, and sometimes slowly. Niche categories and small regions have less public activity to find. We would rather return six defensible leads than forty rows you have to filter. If your market is quiet, the product says so.",
   },
 ] as const;
-
-const STATUS_LABELS: Record<SignalStatus, string> = {
-  live: "Live",
-  partly_live: "Partly live",
-  by_hand: "By hand",
-};
-
-function StatusChip({ status }: { status: SignalStatus }) {
-  return (
-    <span className={styles.statusChip} data-status={status}>
-      {STATUS_LABELS[status]}
-    </span>
-  );
-}
 
 export function ProductSections() {
   return (
@@ -146,14 +65,16 @@ export function ProductSections() {
         <header className={styles.sectionHead}>
           <p className={styles.eyebrow}>How it works</p>
           <h2 id="home-workflow-title" className={styles.sectionTitle}>
-            Four moves, in your order.
+            See the reason. Keep the decision.
           </h2>
           <p className={styles.sectionLede}>
-            Collect dated evidence. Qualify it against your buyer. Review the dossier and the
-            draft. Then decide whether anything is sent. The product is built so the last decision
-            stays yours.
+            Most tools sell you rows. LetMeLead sells you a case for the conversation: what changed,
+            when it changed, and why it matters to what you sell. The last move — claim, send, wait —
+            stays with you.
           </p>
         </header>
+
+        <PipelineDiagram />
 
         <ol className={styles.workflow}>
           <li className={styles.step}>
@@ -164,32 +85,31 @@ export function ProductSections() {
             <div className={styles.stepBody}>
               <div className={styles.stepText}>
                 <p className={styles.stepKicker}>Collect</p>
-                <h3 className={styles.stepTitle}>Paste a website. Build a target list.</h3>
+                <h3 className={styles.stepTitle}>Evidence, not a list of strangers.</h3>
                 <p className={styles.stepCopy}>
-                  LetMeLead turns the site, or the brief you paste, into an ICP and a watchlist.
-                  Seven adapters then look for dated public evidence. News, job boards and Reddit
-                  are on by default; the credential-backed adapters stay off until you configure
-                  them. Scans run every six hours, and each tenant chooses which automatic signals
-                  it wants.
+                  Point us at what you sell. We watch the public moments that change a company&apos;s
+                  priorities — a funding round, a first sales leader, a cluster of hires, a launch, a
+                  complaint in a review thread — and keep the source and the date attached to every
+                  one. No scraped roster, no guessed intent.
                 </p>
               </div>
-              <aside className={styles.stepAside} aria-label="Adapters and scan facts">
-                <p className={styles.asideLabel}>7 adapters that can run on a scan</p>
+              <aside className={styles.stepAside} aria-label="The kinds of moments we watch">
+                <p className={styles.asideLabel}>Moments worth a message</p>
                 <ul className={styles.sourceMini}>
-                  {SOURCE_ADAPTERS.map((source) => (
-                    <li key={source.name} className={styles.sourceMiniItem}>
-                      {source.name} <span>{source.statusLabel}</span>
+                  {SIGNAL_CATEGORIES.slice(0, 6).map((category) => (
+                    <li key={category.name} className={styles.sourceMiniItem}>
+                      {category.name}
                     </li>
                   ))}
                 </ul>
                 <ul className={`${styles.factList} ${styles.stepAsideFacts}`}>
                   <li className={styles.fact}>
-                    <span className={styles.factLabel}>Signal catalog</span>
-                    <span className={styles.factValue}>51 in 8 categories</span>
+                    <span className={styles.factLabel}>Every clue keeps</span>
+                    <span className={styles.factValue}>Its source and date</span>
                   </li>
                   <li className={styles.fact}>
-                    <span className={styles.factLabel}>Free defaults</span>
-                    <span className={styles.factValue}>News, jobs, Reddit</span>
+                    <span className={styles.factLabel}>Freshness</span>
+                    <span className={styles.factValue}>Old news ranks lower</span>
                   </li>
                 </ul>
               </aside>
@@ -204,32 +124,32 @@ export function ProductSections() {
             <div className={styles.stepBody}>
               <div className={styles.stepText}>
                 <p className={styles.stepKicker}>Qualify</p>
-                <h3 className={styles.stepTitle}>Signals first. Audience fit second.</h3>
+                <h3 className={styles.stepTitle}>A reason beats a filter.</h3>
                 <p className={styles.stepCopy}>
-                  Evidence is de-duplicated per real-world event, decayed by age, scored, then
-                  checked against your audience. When an LLM is configured it takes the qualification
-                  pass; otherwise lexical heuristics do the work and the record says so. A weak fit
-                  is shown as a weak fit, not hidden as a silent rejection.
+                  A job title is not a buying signal until it collides with what you sell. Every clue
+                  is checked against the buyer you described, weighted by how recent it is, and
+                  de-duplicated so one real-world event stays one lead. A weak fit is shown as a weak
+                  fit — never quietly promoted to fill a quota.
                 </p>
               </div>
-              <aside className={styles.stepAside} aria-label="Qualification facts">
-                <p className={styles.asideLabel}>What qualification looks at</p>
+              <aside className={styles.stepAside} aria-label="What qualification looks at">
+                <p className={styles.asideLabel}>What we weigh</p>
                 <ul className={styles.factList}>
                   <li className={styles.fact}>
-                    <span className={styles.factLabel}>Signal age</span>
-                    <span className={styles.factValue}>Decays with time</span>
+                    <span className={styles.factLabel}>Your buyer</span>
+                    <span className={styles.factValue}>Not a keyword list</span>
                   </li>
                   <li className={styles.fact}>
-                    <span className={styles.factLabel}>Duplicates</span>
-                    <span className={styles.factValue}>One per event</span>
+                    <span className={styles.factLabel}>The moment</span>
+                    <span className={styles.factValue}>What actually changed</span>
                   </li>
                   <li className={styles.fact}>
-                    <span className={styles.factLabel}>Audience</span>
-                    <span className={styles.factValue}>ICP and fit confidence</span>
+                    <span className={styles.factLabel}>Age</span>
+                    <span className={styles.factValue}>Fresh beats stale</span>
                   </li>
                   <li className={styles.fact}>
-                    <span className={styles.factLabel}>Model</span>
-                    <span className={styles.factValue}>LLM or labelled heuristics</span>
+                    <span className={styles.factLabel}>Verdict</span>
+                    <span className={styles.factValue}>Shown, not hidden</span>
                   </li>
                 </ul>
               </aside>
@@ -244,40 +164,39 @@ export function ProductSections() {
             <div className={styles.stepBody}>
               <div className={styles.stepText}>
                 <p className={styles.stepKicker}>Review</p>
-                <h3 className={styles.stepTitle}>A dossier you can disagree with.</h3>
+                <h3 className={styles.stepTitle}>The receipt comes before the lead.</h3>
                 <p className={styles.stepCopy}>
-                  Open a lead and you get the plain-language reason, signal age, fit confidence and
-                  an evidence timeline with the source URL and date for each item. The draft is
-                  rendered from that signal, not from a template with the company name swapped in.
-                  Contacts keep their caveat: a role and a search link are not the same as a verified
-                  person.
+                  Open a lead and the first thing you see is why it exists: the clue, the source, the
+                  date, the line that connects it to your offer. Then the person, with their role
+                  first. Then a draft written from that clue — not a template with the company name
+                  swapped in.
                 </p>
               </div>
               <aside className={styles.stepAside} aria-label="What a lead dossier contains">
-                <p className={styles.asideLabel}>Inside a lead dossier</p>
+                <p className={styles.asideLabel}>Inside a lead</p>
                 <ul className={styles.reviewStack}>
                   <li className={styles.reviewRow}>
                     <p>
-                      <strong>Evidence timeline</strong>
-                      <span>Title, source, URL, publish date and strength for every item.</span>
+                      <strong>Why now</strong>
+                      <span>One sentence you could say out loud on a call.</span>
                     </p>
                   </li>
                   <li className={styles.reviewRow}>
                     <p>
-                      <strong>Fit reasoning</strong>
-                      <span>Audience match, timing clues and the confidence behind them.</span>
+                      <strong>The receipt</strong>
+                      <span>Source, link and publish date for every clue.</span>
                     </p>
                   </li>
                   <li className={styles.reviewRow}>
                     <p>
-                      <strong>Contact status</strong>
-                      <span>Role first. Unverified unless a provider returned details.</span>
+                      <strong>The person</strong>
+                      <span>Role first. Verified details only when found.</span>
                     </p>
                   </li>
                   <li className={styles.reviewRow}>
                     <p>
-                      <strong>Review-only draft</strong>
-                      <span>Grounded in the signal, labelled for review, with no delivery action.</span>
+                      <strong>The first line</strong>
+                      <span>Grounded in the clue, and yours to rewrite.</span>
                     </p>
                   </li>
                 </ul>
@@ -292,33 +211,32 @@ export function ProductSections() {
             </div>
             <div className={styles.stepBody}>
               <div className={styles.stepText}>
-                <p className={styles.stepKicker}>Send</p>
-                <h3 className={styles.stepTitle}>Your account. Your pacing. Your call.</h3>
+                <p className={styles.stepKicker}>Decide</p>
+                <h3 className={styles.stepTitle}>Nothing leaves without you.</h3>
                 <p className={styles.stepCopy}>
-                  Nothing sends automatically. When you enable live outreach, the worker uses the
-                  LinkedIn session you connected, ramps from 5 to 20 invitations a day with jitter,
-                  sends only on weekdays inside business hours, and stops a lead&apos;s sequence the
-                  moment a reply arrives. Pausing the account or the campaign halts the queue before
-                  the next send.
+                  Claiming a lead, spending a credit and sending a message are three separate
+                  decisions, and each one needs your hand on it. Send it yourself, or switch on
+                  paced outreach from your own account. Either way it stops the moment someone
+                  replies — and it never starts on its own.
                 </p>
               </div>
-              <aside className={styles.stepAside} aria-label="Sending controls">
-                <p className={styles.asideLabel}>Default sending controls</p>
+              <aside className={styles.stepAside} aria-label="Sending defaults">
+                <p className={styles.asideLabel}>The defaults</p>
                 <ul className={styles.factList}>
                   <li className={styles.fact}>
-                    <span className={styles.factLabel}>Live sending</span>
-                    <span className={styles.factValue}>Off</span>
+                    <span className={styles.factLabel}>Auto-send</span>
+                    <span className={styles.factValue}>Never</span>
                   </li>
                   <li className={styles.fact}>
-                    <span className={styles.factLabel}>Dry run</span>
-                    <span className={styles.factValue}>On</span>
+                    <span className={styles.factLabel}>Free claims</span>
+                    <span className={styles.factValue}>10</span>
                   </li>
                   <li className={styles.fact}>
-                    <span className={styles.factLabel}>Daily ramp</span>
-                    <span className={styles.factValue}>5 → 20</span>
+                    <span className={styles.factLabel}>Credits spent on</span>
+                    <span className={styles.factValue}>Claims only</span>
                   </li>
                   <li className={styles.fact}>
-                    <span className={styles.factLabel}>On reply</span>
+                    <span className={styles.factLabel}>On a reply</span>
                     <span className={styles.factValue}>Sequence stops</span>
                   </li>
                 </ul>
@@ -330,83 +248,31 @@ export function ProductSections() {
 
       <section id="signals" className={styles.section} aria-labelledby="home-signals-title">
         <header className={styles.sectionHead}>
-          <p className={styles.eyebrow}>Sources and signals</p>
+          <p className={styles.eyebrow}>What we watch</p>
           <h2 id="home-signals-title" className={styles.sectionTitle}>
-            Seven adapters. Fifty-one signals. Honest labels.
+            The signals most teams find three weeks late.
           </h2>
           <p className={styles.sectionLede}>
-            Signals show timing, not intent: a source is only useful if you know how often it really
-            runs. The catalog separates what is automatic, what is conditional and what still needs a
-            person. Coverage is not a promise of a signal for every company.
+            Timing is the whole advantage. A company that just hired its first security lead is
+            easier to help than one picked off a list in March — if you know this week. These are the
+            moments worth a message.
           </p>
         </header>
 
-        <div className={styles.signalSummary} aria-label="Signal catalog totals">
-          <div className={styles.summaryCell}>
-            <span className={styles.summaryValue}>{SIGNAL_TOTALS.signals}</span>
-            <span className={styles.summaryLabel}>signals in the catalog</span>
-          </div>
-          <div className={styles.summaryCell}>
-            <span className={styles.summaryValue}>{SIGNAL_TOTALS.categories}</span>
-            <span className={styles.summaryLabel}>categories</span>
-          </div>
-          <div className={styles.summaryCell}>
-            <span className={styles.summaryValue}>
-              {SIGNAL_TOTALS.live} / {SIGNAL_TOTALS.partlyLive}
-            </span>
-            <span className={styles.summaryLabel}>live / partly live</span>
-          </div>
-          <div className={styles.summaryCell}>
-            <span className={styles.summaryValue}>{SIGNAL_TOTALS.byHand}</span>
-            <span className={styles.summaryLabel}>by hand, not automatic</span>
-          </div>
-        </div>
-
-        <div className={styles.tableWrap}>
-          <table className={styles.table}>
-            <caption>
-              The seven source adapters in the repository. The status is an honest coverage label
-              for the adapter, not a promise of complete coverage; the signal catalog uses the same
-              Live / Partly live / By hand labels.
-            </caption>
-            <thead>
-              <tr>
-                <th scope="col">Adapter</th>
-                <th scope="col">Status</th>
-                <th scope="col">What it looks for</th>
-                <th scope="col">What it needs</th>
-              </tr>
-            </thead>
-            <tbody>
-              {SOURCE_ADAPTERS.map((source) => (
-                <tr key={source.name}>
-                  <td>{source.name}</td>
-                  <td>
-                    <StatusChip status={source.status} />
-                  </td>
-                  <td>{source.looksFor}</td>
-                  <td>{source.needs}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        <div className={styles.categoryGrid} aria-label="Signal categories and counts">
+        <div className={styles.categoryGrid} aria-label="Signal categories">
           {SIGNAL_CATEGORIES.map((category) => (
             <div key={category.name} className={styles.categoryItem}>
               <span className={styles.categoryName}>{category.name}</span>
-              <span className={styles.categoryCount}>{category.count} signals</span>
+              <span className={styles.categoryCount}>{category.blurb}</span>
             </div>
           ))}
         </div>
 
         <aside className={styles.honesty}>
           <p>
-            <StatusChip status="by_hand" /> <strong>means not automated.</strong> The other{" "}
-            {SIGNAL_TOTALS.byHand} signals have no collector behind them yet, so they cannot be
-            toggled on. You gather that evidence outside the adapters; there is no staffed-research
-            promise attached to the label.
+            <strong>A signal is a reason to talk, not a promise to buy.</strong> It shows a moment:
+            a new budget owner, a system under strain, a decision coming into view. The product never
+            dresses a coincidence up as intent, and an empty week is reported as an empty week.
           </p>
         </aside>
       </section>
@@ -419,55 +285,52 @@ export function ProductSections() {
               You keep the account, the credits and the send button.
             </h2>
             <p className={styles.sectionLede}>
-              The defaults are deliberately quiet: no live sending, no automatic claims, no session
-              handed to a third party. Every movement is either your action or a row you can inspect.
+              The quiet defaults are the feature: no live sending, no automatic claims, no session
+              handed to anyone else. Every movement is either your action or a row you can inspect.
             </p>
             <ul className={styles.inlineLinks}>
               <li>
-                <Link href="/trust">Read the trust and data notes</Link>
+                <Link href="#limitations">Read where it stops</Link>
               </li>
             </ul>
           </div>
 
           <ul className={styles.controlList}>
             <li className={styles.controlItem}>
-              <p className={styles.controlTerm}>Credits</p>
+              <p className={styles.controlTerm}>You pay per lead, not per seat</p>
               <p className={styles.controlCopy}>
-                10 free claims per workspace, then <strong>1 credit per claim</strong>. A
-                100-credit pack is <strong>USD 49 by default</strong> and the server can configure
-                another size or price. Scanning itself does not spend credits. The ledger is
-                append-only and refuses to go negative.
+                10 free claims, then <strong>one credit per claimed lead</strong>. 100 credits are{" "}
+                <strong>$49</strong> — about 49 cents a lead. Reading, filtering and rescanning are
+                free, so a quiet week costs you nothing.
               </p>
             </li>
             <li className={styles.controlItem}>
-              <p className={styles.controlTerm}>Review first</p>
+              <p className={styles.controlTerm}>Nothing is claimed for you</p>
               <p className={styles.controlCopy}>
-                A claim is a human decision. The REST API, the dashboard and the MCP server share
-                the same credits and audit. Agents are instructed not to claim or send without
-                explicit approval.
+                A claim is a human decision. Your dashboard, your agent and the API all stop at the
+                same approval, so a model cannot spend your credits to look busy.
               </p>
             </li>
             <li className={styles.controlItem}>
-              <p className={styles.controlTerm}>LinkedIn session</p>
+              <p className={styles.controlTerm}>Your account, your identity</p>
               <p className={styles.controlCopy}>
-                You sign in locally with <code>scripts/linkedin_session.py</code>. The Playwright
-                storage state is encrypted at rest with <code>SESSION_ENCRYPTION_KEY</code> and is
-                never returned by the API.
+                Outreach runs from the LinkedIn account you connect, not a shared pool of rented
+                profiles. Your session stays on your side and is never returned to the interface.
               </p>
             </li>
             <li className={styles.controlItem}>
-              <p className={styles.controlTerm}>No auto-send</p>
+              <p className={styles.controlTerm}>Sending is off until you say otherwise</p>
               <p className={styles.controlCopy}>
-                Sending is off and dry-run is on by default. Enabled, the worker ramps 5 → 20 a day,
-                waits 45–180 seconds between actions, stays inside weekdays and business hours, and
-                withdraws unanswered invitations after 21 days.
+                Preview-only by default. When you switch it on, the pace starts slow, stays inside
+                business hours, leaves a human gap between actions and withdraws an unanswered
+                invitation after three weeks.
               </p>
             </li>
             <li className={styles.controlItem}>
-              <p className={styles.controlTerm}>Audit log</p>
+              <p className={styles.controlTerm}>Every action leaves a receipt</p>
               <p className={styles.controlCopy}>
-                Every claim, send, pause, API-key change and billing event is recorded with its
-                actor and time. <code>GET /v1/audit</code> answers who did what, and when.
+                Claims, sends, pauses and credit movements are recorded with who did them and when.
+                Hand the record to your team, or to a client, without reconstructing it from memory.
               </p>
             </li>
           </ul>
@@ -476,14 +339,14 @@ export function ProductSections() {
 
       <section id="integrations" className={styles.section} aria-labelledby="home-integrations-title">
         <header className={styles.sectionHead}>
-          <p className={styles.eyebrow}>Integrations</p>
+          <p className={styles.eyebrow}>Built for agents, too</p>
           <h2 id="home-integrations-title" className={styles.sectionTitle}>
-            One API underneath the dashboard and the agent.
+            Your agent can do the work. It still asks before it spends.
           </h2>
           <p className={styles.sectionLede}>
-            The REST surface lives under <code>/v1</code>. The MCP server exposes the same tools over
-            Streamable HTTP, so a model cannot take an action the dashboard could not. Bring your own
-            model and enrichment keys, or run without them and accept the labelled fallbacks.
+            Claude, Codex, Cursor or your own automation can read the leads, filter the watchlist and
+            draft the message. The credits, the approvals and the audit trail stay exactly where they
+            are in the dashboard.
           </p>
         </header>
 
@@ -491,65 +354,50 @@ export function ProductSections() {
           <div>
             <ul className={styles.integrationFacts}>
               <li className={styles.integrationFact}>
-                <span>REST base</span>
-                <strong>/v1</strong>
+                <span>Works with</span>
+                <strong>Claude, Codex, Cursor</strong>
               </li>
               <li className={styles.integrationFact}>
-                <span>MCP endpoint</span>
-                <strong>localhost:8765/mcp</strong>
+                <span>Sees</span>
+                <strong>Your workspace, your leads</strong>
               </li>
               <li className={styles.integrationFact}>
-                <span>MCP tools</span>
-                <strong>13</strong>
+                <span>Before a claim</span>
+                <strong>Asks you first</strong>
               </li>
               <li className={styles.integrationFact}>
-                <span>Authentication</span>
-                <strong>Bearer JWT or X-API-Key</strong>
-              </li>
-              <li className={styles.integrationFact}>
-                <span>Model provider</span>
-                <strong>Your key, or none</strong>
-              </li>
-              <li className={styles.integrationFact}>
-                <span>Enrichment</span>
-                <strong>Your key, or pattern</strong>
+                <span>Before a send</span>
+                <strong>Asks you first</strong>
               </li>
             </ul>
             <ul className={styles.inlineLinks}>
               <li>
-                <Link href="/integrations">Open the integration reference</Link>
+                <Link href="/signup">Try it with your agent</Link>
               </li>
             </ul>
           </div>
 
           <div>
-            <p className={styles.codeCaption}>MCP client block, default local endpoint</p>
-            <pre className={styles.codeBlock}>
-              <code>{`{
-  "mcpServers": {
-    "letmelead": {
-      "type": "http",
-      "url": "http://localhost:8765/mcp",
-      "headers": {
-        "Authorization": "Bearer lml_..."
-      }
-    }
-  }
-}`}</code>
-            </pre>
+            <p className={styles.codeCaption}>One connection, then plain language</p>
+            <ul className={styles.sourceMini}>
+              <li className={styles.sourceMiniItem}>“Find this week&apos;s strongest leads for Q4.”</li>
+              <li className={styles.sourceMiniItem}>“Why is this company in my queue?”</li>
+              <li className={styles.sourceMiniItem}>“Draft the first line, do not send it.”</li>
+              <li className={styles.sourceMiniItem}>“Mark this one not a fit, with my reason.”</li>
+            </ul>
           </div>
         </div>
       </section>
 
       <section id="limitations" className={styles.section} aria-labelledby="home-limitations-title">
         <header className={styles.sectionHead}>
-          <p className={styles.eyebrow}>Limitations</p>
+          <p className={styles.eyebrow}>Where it stops</p>
           <h2 id="home-limitations-title" className={styles.sectionTitle}>
             The edges are part of the product.
           </h2>
           <p className={styles.sectionLede}>
-            A signal is a dated clue, not a purchase order. These are the places where the system
-            stops, and saying so is more useful than pretending the coverage is complete.
+            A signal is a dated clue, not a purchase order. Saying where the evidence ends is more
+            useful than pretending the coverage is complete.
           </p>
         </header>
 
@@ -557,48 +405,31 @@ export function ProductSections() {
           <article className={styles.limitation}>
             <span className={styles.limitationLabel}>No fabricated data</span>
             <p className={styles.limitationCopy}>
-              The engine does not invent names, emails, companies or results. If a source did not
-              state a name, the lead carries a role and a search link. If no enrichment provider
-              returned an address, the contact stays unverified.
+              No invented names, emails, companies or results. If a source did not state a name, the
+              lead carries a role and a profile link. If no provider returned an address, the contact
+              stays unverified.
             </p>
           </article>
           <article className={styles.limitation}>
-            <span className={styles.limitationLabel}>Signal coverage varies</span>
+            <span className={styles.limitationLabel}>Coverage varies</span>
             <p className={styles.limitationCopy}>
-              8 signals are live, 21 are partly live and 22 are by hand. A quiet company, a
-              non-public careers page or a region outside the configured Maps query can produce
-              nothing. An empty result is not evidence that the company has no reason to buy.
-            </p>
-          </article>
-          <article className={styles.limitation}>
-            <span className={styles.limitationLabel}>By hand is not automated</span>
-            <p className={styles.limitationCopy}>
-              The 22 by-hand signals cannot be switched on because no adapter backs them. You
-              gather that evidence yourself. There is no staffed-research service behind the label.
+              A quiet company, a private careers page or an unsupported region can produce nothing.
+              An empty result is not evidence that the company has no reason to buy — it is evidence
+              that nothing public was found.
             </p>
           </article>
           <article className={styles.limitation}>
             <span className={styles.limitationLabel}>Timing is not intent</span>
             <p className={styles.limitationCopy}>
-              A funding round, a new sales hire or a bad review shows a moment, not a budget. Fit
-              confidence is a judgement with evidence attached; it is not a prediction that the
-              company will reply or buy.
+              A funding round, a new hire or a bad review shows a moment, not a budget. Fit is a
+              judgement with evidence attached; it is not a prediction that anyone will reply.
             </p>
           </article>
           <article className={styles.limitation}>
-            <span className={styles.limitationLabel}>LinkedIn automation carries platform risk</span>
+            <span className={styles.limitationLabel}>Automation carries platform risk</span>
             <p className={styles.limitationCopy}>
-              Automated messaging may breach LinkedIn&apos;s User Agreement. Pacing, jitter and reply
-              stops reduce risk; they do not make automation permitted. Decide deliberately for your
-              own account, and prefer dry-run plus manual sending where policy is unclear.
-            </p>
-          </article>
-          <article className={styles.limitation}>
-            <span className={styles.limitationLabel}>No delivery guarantee</span>
-            <p className={styles.limitationCopy}>
-              A draft is text until you queue it. Email delivery, profile accuracy and reply rates
-              depend on external providers and the recipient. The product does not claim a send
-              succeeded unless the worker recorded it.
+              Automated messaging may breach LinkedIn&apos;s terms. Pacing and reply-stops reduce the
+              risk; they do not make automation permitted. Decide deliberately for your own account.
             </p>
           </article>
         </div>
@@ -608,10 +439,10 @@ export function ProductSections() {
         <header className={styles.sectionHead}>
           <p className={styles.eyebrow}>Questions</p>
           <h2 id="home-faq-title" className={styles.sectionTitle}>
-            The questions the product should answer plainly.
+            The answers you would want before paying.
           </h2>
           <p className={styles.sectionLede}>
-            Short answers, with the defaults and the edges left in. Open a question for the detail.
+            Short, specific, and without the marketing gloss. Open a question for the detail.
           </p>
         </header>
 
@@ -626,7 +457,7 @@ export function ProductSections() {
 
         <div className={styles.ctaRow}>
           <Link href="/signup" className={`${styles.btn} ${styles.btnSolid} ${styles.btnLarge}`}>
-            Create a workspace
+            Get 10 free leads
           </Link>
           <Link href="/how-it-works" className={`${styles.btn} ${styles.btnLarge}`}>
             Read the full workflow

@@ -164,19 +164,20 @@
 }
 
 .btn:hover {
-  border-color: #c6cede;
-  background: #fbfcfe;
+  border-color: #cfc7b6;
+  background: var(--mkt-panel, #fffdf8);
 }
 
 .btnSolid {
-  border-color: var(--mkt-ink, #15171c);
-  background: var(--mkt-ink, #15171c);
+  border-color: #a9480a;
+  background: linear-gradient(180deg, #d35f0e, #bd5106);
   color: #ffffff;
+  box-shadow: 0 1px 0 rgb(255 255 255 / 18%) inset, 0 8px 20px -12px rgb(194 86 10 / 60%);
 }
 
 .btnSolid:hover {
-  border-color: #23262e;
-  background: #23262e;
+  border-color: #94400a;
+  background: linear-gradient(180deg, #df6a15, #c2560a);
 }
 
 .btnQuiet {
@@ -1363,4 +1364,34 @@
   .honesty {
     border: 1px solid CanvasText;
   }
+}
+
+/* Night surfaces for the amber notes and the active stage tab. */
+:global(html[data-site-theme="dark"]) .honesty,
+:global(html[data-site-theme="dark"]) .callout {
+  color: #e6c79a;
+}
+
+:global(html[data-site-theme="dark"]) .honesty strong,
+:global(html[data-site-theme="dark"]) .callout strong {
+  color: #f4dcbb;
+}
+
+:global(html[data-site-theme="dark"]) .statusChip[data-status="live"] {
+  border-color: #2b4a3a;
+  background: #12211a;
+}
+
+:global(html[data-site-theme="dark"]) .statusChip[data-status="partly_live"] {
+  border-color: #4a3a22;
+  background: #241a11;
+}
+
+:global(html[data-site-theme="dark"]) .statusChip[data-status="by_hand"] {
+  background: #1b1f26;
+}
+
+:global(html[data-site-theme="dark"]) .prose code,
+:global(html[data-site-theme="dark"]) .inlineCode {
+  background: #14171c;
 }

@@ -1,5 +1,7 @@
 import * as React from "react";
 
+import { CreditGrid } from "./credit-grid";
+
 /**
  * Real commercials only: 10 free claimed leads per workspace, then one credit
  * per claim, and a default 100-credit pack at USD 49 (configurable server-side).
@@ -17,12 +19,11 @@ export function PricingBand() {
             <p className="mkt-lede">
               Every workspace starts with ten free claimed leads. After that a claim costs one credit.
               Scans, re-scans, signals, replies and outreach do not consume credits. The default pack is
-              100 credits for USD 49; the price is a server setting, so the checkout always shows the real
-              amount before you pay.
+              100 credits for $49, and the checkout always shows the real amount before you pay.
             </p>
+            <CreditGrid total={100} />
             <p className="mkt-small">
-              No card is required to set up a workspace. Payment confirmation comes from the server-side
-              order, never from a URL parameter.
+              No card is required to set up a workspace. Nothing renews, and credits never expire.
             </p>
           </div>
 
@@ -46,7 +47,7 @@ export function PricingBand() {
               <dd>
                 <strong>$49</strong> / 100
               </dd>
-              <p>Idempotent Stripe webhooks; the ledger is append-only.</p>
+              <p>A one-time pack, not a subscription. Unclaimed credits wait for you.</p>
             </div>
           </dl>
         </div>

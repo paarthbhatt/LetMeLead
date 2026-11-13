@@ -161,7 +161,11 @@ describe("ProductDemo sample workflow", () => {
     const source = readFileSync(resolve(__dirname, "product-demo.tsx"), "utf8");
     const imports = Array.from(source.matchAll(/\bfrom\s+["']([^"']+)["']/g), (match) => match[1]);
     expect(imports).toEqual(expect.arrayContaining(["react", "motion/react", "./landing-data"]));
-    expect(imports.every((path) => ["lucide-react", "motion/react", "react", "./landing-data", "./demo-styles.module.css"].includes(path))).toBe(true);
+      expect(
+      imports.every((path) =>
+        ["lucide-react", "motion/react", "react", "./landing-data", "./demo-styles.module.css", "./spotlight"].includes(path),
+      ),
+    ).toBe(true);
     expect(source).not.toMatch(/\b(?:fetch|XMLHttpRequest|WebSocket|EventSource|sendBeacon)\s*\(/);
     expect(source).not.toMatch(/\bonSubmit\s*=|\bapi\.|\b(?:send|queue|scan)\s*\(/);
   });

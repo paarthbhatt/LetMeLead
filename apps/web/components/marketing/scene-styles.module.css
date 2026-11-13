@@ -9,6 +9,17 @@
   color-scheme: light;
 }
 
+/* Once the canvas is live, the panel becomes a plotting surface. */
+.scene[data-enhanced="true"] {
+  background-color: #fbfaf6;
+  background-image:
+    radial-gradient(70% 60% at 50% 45%, rgb(43 70 200 / 5%), transparent 70%),
+    radial-gradient(circle at center, rgb(20 21 26 / 13%) 0.6px, transparent 0.8px);
+  background-size: auto, 18px 18px;
+  background-position: center, center;
+  box-shadow: inset 0 0 0 1px rgb(20 21 26 / 4%), inset 0 -40px 80px -60px rgb(20 21 26 / 40%);
+}
+
 .scene:focus-visible {
   outline: 2px solid #517be8;
   outline-offset: -3px;
@@ -100,4 +111,46 @@
   .hint {
     transition: none;
   }
+}
+
+/* Stage furniture: the qualify gate reads as a column of hairlines behind the field. */
+.scene[data-enhanced="true"][data-stage="1"] {
+  background-image:
+    repeating-linear-gradient(90deg, transparent 0 108px, rgb(20 21 26 / 7%) 108px 109px),
+    radial-gradient(70% 60% at 50% 45%, rgb(43 70 200 / 6%), transparent 70%),
+    radial-gradient(circle at center, rgb(20 21 26 / 12%) 0.6px, transparent 0.8px);
+  background-size: auto, auto, 18px 18px;
+}
+
+/* Stage furniture: review reads as ledger rules. */
+.scene[data-enhanced="true"][data-stage="2"] {
+  background-image:
+    repeating-linear-gradient(0deg, transparent 0 44px, rgb(20 21 26 / 6%) 44px 45px),
+    radial-gradient(70% 60% at 50% 45%, rgb(43 70 200 / 4%), transparent 70%),
+    radial-gradient(circle at center, rgb(20 21 26 / 10%) 0.6px, transparent 0.8px);
+  background-size: auto, auto, 18px 18px;
+}
+
+/* Night surface for the evidence field: same field, inverted plotting paper. */
+:global(html[data-site-theme="dark"]) .scene {
+  background-color: #12151a;
+  background-image: radial-gradient(circle at center, rgb(236 240 248 / 14%) 0.7px, transparent 0.9px);
+}
+
+:global(html[data-site-theme="dark"]) .scene[data-enhanced="true"][data-stage="1"] {
+  background-image:
+    repeating-linear-gradient(90deg, transparent 0 108px, rgb(236 240 248 / 8%) 108px 109px),
+    radial-gradient(70% 60% at 50% 45%, rgb(147 169 255 / 10%), transparent 70%),
+    radial-gradient(circle at center, rgb(236 240 248 / 14%) 0.7px, transparent 0.9px);
+}
+
+:global(html[data-site-theme="dark"]) .scene[data-enhanced="true"][data-stage="2"] {
+  background-image:
+    repeating-linear-gradient(0deg, transparent 0 44px, rgb(236 240 248 / 7%) 44px 45px),
+    radial-gradient(70% 60% at 50% 45%, rgb(147 169 255 / 8%), transparent 70%),
+    radial-gradient(circle at center, rgb(236 240 248 / 12%) 0.7px, transparent 0.9px);
+}
+
+:global(html[data-site-theme="dark"]) .scene :global(svg[class*="poster"]) {
+  filter: invert(0.9) hue-rotate(180deg) saturate(0.7) brightness(0.92);
 }

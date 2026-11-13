@@ -4,7 +4,7 @@ import * as React from "react";
 
 import { ScenePoster } from "./scene-poster";
 import { clampStage, decideScene, SCENE_MIN_WIDTH, stageMeta, type SceneStage } from "./scene-helpers";
-import type { EvidenceCanvasHandle } from "./evidence-canvas";
+import type { SignalFieldHandle } from "./signal-field-canvas";
 import styles from "./scene-styles.module.css";
 
 export type EvidenceSceneProps = {
@@ -24,7 +24,7 @@ export function EvidenceScene({ stage = 0, className }: EvidenceSceneProps) {
   const meta = stageMeta(activeStage);
   const hintId = React.useId();
   const hostRef = React.useRef<HTMLDivElement>(null);
-  const handleRef = React.useRef<EvidenceCanvasHandle | null>(null);
+  const handleRef = React.useRef<SignalFieldHandle | null>(null);
   const stageRef = React.useRef<SceneStage>(activeStage);
   const [enhanced, setEnhanced] = React.useState(false);
 
@@ -36,7 +36,7 @@ export function EvidenceScene({ stage = 0, className }: EvidenceSceneProps) {
     const wideQuery = window.matchMedia(`(min-width: ${SCENE_MIN_WIDTH}px)`);
     const controller = new AbortController();
     let live = true;
-    let handle: EvidenceCanvasHandle | null = null;
+    let handle: SignalFieldHandle | null = null;
 
     const eligible = (): boolean => {
       const connection = (navigator as NavigatorWithConnection).connection;
@@ -67,9 +67,9 @@ export function EvidenceScene({ stage = 0, className }: EvidenceSceneProps) {
     };
 
     if (eligible()) {
-      void import("./evidence-canvas")
+      void import("./signal-field-canvas")
         .then((module) =>
-          module.mountEvidenceCanvas({
+          module.mountSignalField({
             host,
             stage: stageRef.current,
             signal: controller.signal,
@@ -125,7 +125,7 @@ export function EvidenceScene({ stage = 0, className }: EvidenceSceneProps) {
       data-stage={activeStage}
       role="group"
       tabIndex={enhanced ? 0 : -1}
-      aria-label={`${meta.label} stage of the evidence sorter. Drag with a pointer to rotate, or use the arrow keys to nudge the view.`}
+      aria-label={`${meta.label} stage of the evidence signal field. Drag with a pointer to rotate, or use the arrow keys to nudge the view.`}
       aria-describedby={hintId}
     >
       <div className={styles.posterLayer} aria-hidden={enhanced || undefined}>

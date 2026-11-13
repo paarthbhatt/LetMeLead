@@ -737,3 +737,81 @@
     border: 1px solid CanvasText;
   }
 }
+
+/* ------------------------------------------------------------------
+   Night surface for the sample dossier. The workbench keeps its
+   structure; only the paper underneath it changes.
+------------------------------------------------------------------ */
+
+:global(html[data-site-theme="dark"]) .demo-section {
+  --demo-ink: #f1f0eb;
+  --demo-muted: #a4aab5;
+  --demo-border: #2b3038;
+  --demo-blue: #9db3ff;
+  color-scheme: dark;
+}
+
+:global(html[data-site-theme="dark"]) .demo-workbench {
+  background: #171a1f;
+  box-shadow: 0 10px 44px rgb(0 0 0 / 45%);
+}
+
+:global(html[data-site-theme="dark"]) .demo-brief {
+  background: #14171c;
+}
+
+:global(html[data-site-theme="dark"]) .demo-brief-input {
+  border-color: #2b3038;
+  background: #101318;
+  color: var(--demo-ink);
+}
+
+:global(html[data-site-theme="dark"]) .demo-audience-option {
+  border-color: #2b3038;
+}
+
+:global(html[data-site-theme="dark"]) .demo-audience-option:hover {
+  border-color: #3d4a6b;
+  background: #1a1f28;
+}
+
+:global(html[data-site-theme="dark"]) .demo-audience-option[data-selected="true"] {
+  border-color: #4d6ad4;
+  background: #1a2133;
+  color: #b9c8ff;
+}
+
+:global(html[data-site-theme="dark"]) .demo-sample-label {
+  border-color: #4a3a22;
+  background: #241a11;
+  color: #e9c99b;
+}
+
+:global(html[data-site-theme="dark"]) .demo-monogram {
+  border-color: #2a3550;
+  background: #1a2030;
+  color: #b9c8ff;
+}
+
+:global(html[data-site-theme="dark"]) .demo-uncertainty {
+  border-left-color: #b0712a;
+  background: #241a11;
+  color: #e9c99b;
+}
+
+:global(html[data-site-theme="dark"]) .demo-message {
+  background: #14171c;
+}
+
+:global(html[data-site-theme="dark"]) .demo-evidence summary:hover {
+  background: #1b1f26;
+}
+
+:global(html[data-site-theme="dark"]) .demo-disclosure {
+  background: #14171c;
+}
+
+:global(html[data-site-theme="dark"]) .demo-message-subject,
+:global(html[data-site-theme="dark"]) .demo-message-body {
+  background: #14171c;
+}

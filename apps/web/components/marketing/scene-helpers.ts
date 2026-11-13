@@ -15,22 +15,22 @@ export const STAGE_META: readonly SceneStageMeta[] = [
     id: 0,
     code: "01",
     label: "Collect",
-    description: "Small labelled evidence tokens drift along two soft rails into the central intake.",
-    announcement: "Collect stage. Evidence tokens gather along two rails toward the intake.",
+    description: "One glowing point per piece of public evidence drifts in a slow spiral.",
+    announcement: "Collect stage. Evidence particles gather in a slow spiral.",
   },
   {
     id: 1,
     code: "02",
     label: "Qualify",
-    description: "Tokens pass through three gate frames; weak evidence shrinks back as stronger evidence moves on.",
-    announcement: "Qualify stage. Tokens pass through three gates; weaker evidence is set aside.",
+    description: "The field forms a gate; weak evidence sinks and dims while stronger evidence carries on.",
+    announcement: "Qualify stage. Particles pass a gate; weaker evidence sinks and dims.",
   },
   {
     id: 2,
     code: "03",
     label: "Review",
-    description: "A lead dossier assembles and the surviving evidence docks as inspected rows.",
-    announcement: "Review stage. A lead dossier assembles with evidence docked as review rows.",
+    description: "The surviving evidence snaps into the rows of a lead dossier.",
+    announcement: "Review stage. Surviving evidence snaps into dossier rows.",
   },
 ] as const;
 

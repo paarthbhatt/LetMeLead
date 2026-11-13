@@ -6,6 +6,7 @@ import * as React from "react";
 
 import { DEMO_AUDIENCES, SAMPLE_DISCLOSURE, SAMPLE_DOSSIERS, type DemoAudienceId } from "./landing-data";
 import styles from "./demo-styles.module.css";
+import { Spotlight } from "./spotlight";
 
 const AUDIENCE_ICONS = { security: Shield, revenue: Target, agency: BriefcaseBusiness };
 
@@ -30,7 +31,7 @@ export function ProductDemo() {
           </p>
         </header>
 
-        <div className={styles["demo-workbench"]}>
+        <Spotlight className={styles["demo-workbench"]}>
           <div className={styles["demo-toolbar"]}>
             <fieldset className={styles["demo-audiences"]} aria-describedby={`${id}-audience-hint`}>
               <legend>Choose an audience</legend>
@@ -220,7 +221,7 @@ export function ProductDemo() {
           </motion.article>
 
           <p className={styles["demo-disclosure"]}>{SAMPLE_DISCLOSURE}</p>
-        </div>
+        </Spotlight>
       </section>
     </MotionConfig>
   );

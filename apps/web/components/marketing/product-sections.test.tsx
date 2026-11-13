@@ -4,18 +4,10 @@ import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
 import { MktFooter, MktHeader } from "./mkt-chrome";
-import {
-  FAQ_ITEMS,
-  ProductSections,
-  SIGNAL_CATEGORIES,
-  SIGNAL_TOTALS,
-  SOURCE_ADAPTERS,
-} from "./product-sections";
+import { FAQ_ITEMS, SIGNAL_CATEGORIES, ProductSections } from "./product-sections";
 
 const PUBLISHED_ROUTES = new Set([
   "/how-it-works",
-  "/integrations",
-  "/trust",
   "/signup",
   "/login",
   "/demo",
@@ -28,51 +20,41 @@ function contentLinks(container: HTMLElement) {
 }
 
 describe("ProductSections", () => {
-  it("renders the four-stage workflow with its real labels and limits", () => {
+  it("renders the four-stage workflow with benefit-led headings", () => {
     render(<ProductSections />);
 
-    const workflow = screen.getByRole("region", { name: "Four moves, in your order." });
+    const workflow = screen.getByRole("region", { name: "See the reason. Keep the decision." });
     expect(workflow.id).toBe("how-it-works");
     for (const heading of [
-      "Paste a website. Build a target list.",
-      "Signals first. Audience fit second.",
-      "A dossier you can disagree with.",
-      "Your account. Your pacing. Your call.",
+      "Evidence, not a list of strangers.",
+      "A reason beats a filter.",
+      "The receipt comes before the lead.",
+      "Nothing leaves without you.",
     ]) {
       expect(screen.getByRole("heading", { name: heading })).toBeTruthy();
     }
-
-    expect(screen.getByText("51 in 8 categories")).toBeTruthy();
-    expect(screen.getByText(/7 adapters/i)).toBeTruthy();
-    expect(screen.getByText(/Nothing sends automatically/i)).toBeTruthy();
-    expect(screen.getByText(/Scanning itself does not spend credits/i)).toBeTruthy();
-    expect(screen.getByText(/Signals show timing, not intent/i)).toBeTruthy();
-    expect(screen.getAllByText(/no staffed-research promise/i).length).toBeGreaterThan(0);
   });
 
-  it("labels live, partly live and by-hand coverage without overstating it", () => {
-    render(<ProductSections />);
+  it("answers the money and control questions in plain numbers", () => {
+    const { container } = render(<ProductSections />);
+    const text = container.textContent ?? "";
 
-    const table = screen.getByRole("table", { name: /The seven source adapters/i });
-    expect(within(table).getAllByText("Live")).toHaveLength(2);
-    expect(within(table).getAllByText("Partly live")).toHaveLength(5);
-    expect(screen.getByText("By hand")).toBeTruthy();
-    expect(screen.getAllByText(/means not automated/i).length).toBeGreaterThan(0);
-    expect(screen.getByText(/No fabricated data/i)).toBeTruthy();
-    expect(screen.getByText(/Timing is not intent/i)).toBeTruthy();
-    expect(screen.getByText(/LinkedIn automation carries platform risk/i)).toBeTruthy();
+    expect(text).toMatch(/10 free claims/);
+    expect(text).toMatch(/100 credits are \$49/);
+    expect(text).toMatch(/one credit per claimed lead/);
+    expect(text).toMatch(/No invented names, emails, companies or results/i);
   });
 
-  it("renders the real adapter list with its honest statuses and requirements", () => {
-    render(<ProductSections />);
+  it("keeps the evidence categories qualitative rather than inventory-like", () => {
+    const { container } = render(<ProductSections />);
+    const grid = container.querySelector<HTMLElement>('[aria-label="Signal categories"]');
 
-    expect(SOURCE_ADAPTERS).toHaveLength(7);
-    for (const source of SOURCE_ADAPTERS) {
-      expect(screen.getByRole("cell", { name: source.name })).toBeTruthy();
-      expect(screen.getByText(source.needs)).toBeTruthy();
+    expect(SIGNAL_CATEGORIES).toHaveLength(8);
+    expect(grid).toBeTruthy();
+    for (const category of SIGNAL_CATEGORIES) {
+      expect(within(grid!).getByText(category.name)).toBeTruthy();
+      expect(within(grid!).getByText(category.blurb)).toBeTruthy();
     }
-    expect(screen.getByText("X_BEARER_TOKEN. Official API v2 only.")).toBeTruthy();
-    expect(screen.getByText("REVIEWS_FEED_URL returning a JSON array.")).toBeTruthy();
   });
 
   it("renders all FAQ items as native details and opens on summary activation", () => {
@@ -83,8 +65,6 @@ describe("ProductSections", () => {
     expect(FAQ_ITEMS).toHaveLength(8);
     expect(details).toHaveLength(8);
     expect(summaries).toHaveLength(8);
-    expect(details.length).toBeGreaterThanOrEqual(6);
-    expect(details.length).toBeLessThanOrEqual(8);
     for (const item of FAQ_ITEMS) {
       expect(screen.getByText(item.question)).toBeTruthy();
     }
@@ -100,11 +80,10 @@ describe("ProductSections", () => {
 
     expect(hrefs.length).toBeGreaterThan(0);
     for (const href of hrefs) {
-      expect(PUBLISHED_ROUTES.has(href), `${href} is not one of the published routes`).toBe(true);
+      const inPage = href.startsWith("#");
+      expect(inPage || PUBLISHED_ROUTES.has(href), `${href} is not a published target`).toBe(true);
     }
     expect(hrefs).toContain("/how-it-works");
-    expect(hrefs).toContain("/integrations");
-    expect(hrefs).toContain("/trust");
     expect(hrefs).toContain("/signup");
   });
 
@@ -119,9 +98,8 @@ describe("ProductSections", () => {
 
     expect(hrefs).toContain("/");
     for (const href of hrefs) {
-      expect(href === "/" || PUBLISHED_ROUTES.has(href), `${href} is not a published target`).toBe(
-        true,
-      );
+      const inPage = href === "/" || href.startsWith("/#");
+      expect(inPage || PUBLISHED_ROUTES.has(href), `${href} is not a published target`).toBe(true);
     }
   });
 
@@ -134,26 +112,39 @@ describe("ProductSections", () => {
     expect(text).not.toMatch(/customers say|case study|logo wall/i);
     expect(text).not.toMatch(/award-winning|certified|industry leader/i);
     expect(text).not.toMatch(/\b\d{1,3}(,\d{3})+\s+(customers|teams|companies)\b/i);
-    expect(container.querySelectorAll("img, picture, figure, blockquote")).toHaveLength(0);
+    expect(container.querySelectorAll("img, picture, blockquote")).toHaveLength(0);
+    // The one figure on the page is our own pipeline drawing, not stock imagery.
+    expect(container.querySelectorAll("figure")).toHaveLength(1);
   });
 
-  it("keeps the counts internally consistent with the real catalog", () => {
-    expect(SIGNAL_TOTALS.signals).toBe(51);
-    expect(SIGNAL_TOTALS.categories).toBe(8);
-    expect(SIGNAL_TOTALS.live + SIGNAL_TOTALS.partlyLive + SIGNAL_TOTALS.byHand).toBe(51);
-    expect(SIGNAL_CATEGORIES).toHaveLength(8);
-    expect(SIGNAL_CATEGORIES.reduce((total, category) => total + category.count, 0)).toBe(51);
+  it("keeps the implementation recipe off the public page", () => {
+    const { container } = render(<ProductSections />);
+    const text = container.textContent ?? "";
+
+    for (const leak of [
+      /bearer/i,
+      /api[_ ]key/i,
+      /env(ironment)? var/i,
+      /playwright/i,
+      /append-only/i,
+      /adapter/i,
+      /glsl|webgl|shader/i,
+      /localhost/i,
+      /heuristic/i,
+      /mcp endpoint/i,
+      /_TOKEN|_KEY\b/,
+    ]) {
+      expect(text, `public copy leaked ${leak}`).not.toMatch(leak);
+    }
   });
 
   it("server-renders the information without a client-only shell", () => {
     const html = renderToString(<ProductSections />);
 
-    expect(html).toContain("Four moves, in your order.");
-    expect(html).toContain("Seven adapters. Fifty-one signals. Honest labels.");
-    expect(html).toContain("51 in 8 categories");
-    expect(html).toContain("Nothing sends automatically");
-    expect(html).toContain("Scanning itself does not spend credits");
-    expect(html).toContain("localhost:8765/mcp");
+    expect(html).toContain("See the reason. Keep the decision.");
+    expect(html).toContain("The signals most teams find three weeks late.");
+    expect(html).toContain("Get 10 free leads");
+    expect(html).toContain("Public moments");
     expect(html).toContain("<details");
     expect(html).not.toMatch(/opacity:\s*0(?:[;"\s]|\.)/);
   });

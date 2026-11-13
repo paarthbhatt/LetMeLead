@@ -3,6 +3,9 @@ import * as React from "react";
 
 import styles from "./sections-styles.module.css";
 
+import { ScrollProgress } from "./scroll-progress";
+import { SiteThemeScript, SiteThemeToggle } from "./site-theme";
+
 type MktHeaderProps = {
   /** Show the documented back link on standalone pages. */
   back?: boolean;
@@ -11,6 +14,8 @@ type MktHeaderProps = {
 export function MktHeader({ back = false }: MktHeaderProps) {
   return (
     <header className={styles.header}>
+      <SiteThemeScript />
+      <ScrollProgress />
       {back ? (
         <div className={styles.backBar}>
           <div className={styles.backInner}>
@@ -35,14 +40,12 @@ export function MktHeader({ back = false }: MktHeaderProps) {
           <Link href="/how-it-works" className={styles.navLink}>
             How it works
           </Link>
-          <Link href="/integrations" className={styles.navLink}>
-            Integrations
-          </Link>
-          <Link href="/trust" className={styles.navLink}>
-            Trust
+          <Link href="/#pricing" className={styles.navLink}>
+            Pricing
           </Link>
         </nav>
 
+        <SiteThemeToggle className="mkt-theme-toggle" />
         <div className={styles.headerActions}>
           <Link href="/login" className={`${styles.btn} ${styles.btnQuiet}`}>
             Sign in
@@ -83,10 +86,7 @@ export function MktFooter() {
                 <Link href="/how-it-works">How it works</Link>
               </li>
               <li>
-                <Link href="/integrations">Integrations</Link>
-              </li>
-              <li>
-                <Link href="/trust">Trust and data</Link>
+                <Link href="/#pricing">Pricing</Link>
               </li>
             </ul>
           </div>
