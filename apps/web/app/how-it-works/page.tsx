@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { MktFooter, MktHeader } from "@/components/marketing/mkt-chrome";
-import { SIGNAL_TOTALS, SOURCE_ADAPTERS } from "@/components/marketing/product-sections";
 import styles from "@/components/marketing/sections-styles.module.css";
 
 import "../marketing.css";
@@ -18,13 +17,13 @@ const STAGE_COSTS = [
     stage: "Collect",
     work: "Adapters scan the targets you watch for dated public evidence.",
     credits: "0",
-    limits: "Per-source daily quota, default 200. Scans run every 6 hours.",
+    limits: "Sources are checked on a schedule. A quiet week costs nothing.",
   },
   {
     stage: "Qualify",
     work: "De-duplicate per event, decay by age, score and check audience fit.",
     credits: "0",
-    limits: "An LLM is optional. Heuristics are labelled when used.",
+    limits: "A weak fit stays labelled weak instead of being hidden.",
   },
   {
     stage: "Review",
@@ -36,13 +35,13 @@ const STAGE_COSTS = [
     stage: "Claim",
     work: "Make a lead yours so it can enter a campaign.",
     credits: "0 for the first 10, then 1 per claim",
-    limits: "One domain per tenant. The ledger is append-only.",
+    limits: "One credit, one lead. Nothing is claimed for you.",
   },
   {
     stage: "Send",
     work: "Queue a campaign and let the worker send at a human pace.",
     credits: "0",
-    limits: "Off and dry-run by default. 5 → 20 a day, weekdays, 07:00–19:00 UTC.",
+    limits: "Off and preview-only by default. Slow ramp, weekdays, business hours.",
   },
 ] as const;
 
@@ -61,15 +60,15 @@ export default function HowItWorksPage() {
             You decide what is true enough to use and whether anything leaves your account.
           </p>
           <p className={styles.pageMeta}>
-            This page describes the implemented workflow in the repository. Signals show timing, not
-            intent. Coverage varies by company, source and region.
+            This page describes what the product does today, including the parts it will not do.
+            Signals show timing, not intent. Coverage varies by company, source and region.
           </p>
           <div className={styles.pageActions}>
             <Link href="/signup" className={`${styles.btn} ${styles.btnSolid} ${styles.btnLarge}`}>
               Create a workspace
             </Link>
-            <Link href="/integrations" className={`${styles.btn} ${styles.btnLarge}`}>
-              Integration reference
+            <Link href="/#pricing" className={`${styles.btn} ${styles.btnLarge}`}>
+              See what it costs
             </Link>
           </div>
         </header>
@@ -86,58 +85,32 @@ export default function HowItWorksPage() {
 
             <div className={styles.example}>
               <strong>Concrete example.</strong> A B2B software company adds a first security-lead
-              role to its careers page. The job-board adapter recognises the Greenhouse board,
-              records the role title, the publish date and the URL, and files it as a hiring signal.
+              role to its careers page. The new role, its publish date and the link are recorded as
+              a hiring signal.
               If the same role also appears in a news item, the event fingerprint keeps one copy
               rather than counting the same moment twice.
             </div>
 
-            <h3>What runs, and what it needs</h3>
-            <div className={styles.tableWrap}>
-              <table className={styles.table}>
-                <caption>
-                  These are the seven adapters in the repository. A source with missing credentials
-                  is reported as unavailable; the rest of the scan still completes.
-                </caption>
-                <thead>
-                  <tr>
-                    <th scope="col">Adapter</th>
-                    <th scope="col">Status</th>
-                    <th scope="col">What it needs</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {SOURCE_ADAPTERS.map((source) => (
-                    <tr key={source.name}>
-                      <td>{source.name}</td>
-                      <td>
-                        <span className={styles.statusChip} data-status={source.status}>
-                          {source.statusLabel}
-                        </span>
-                      </td>
-                      <td>{source.needs}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <h3>Where the evidence comes from</h3>
+            <p className={styles.docLead}>
+              Public material only: company news and careers pages, discussion forums and review
+              sites, local listings, and social pages that are public. Every item keeps its title,
+              source, link and publish date, so the reason you were given is one you can check.
+            </p>
 
             <ul className={styles.miniList}>
+              <li>One real-world event stays one lead. A syndicated article is not five signals.</li>
               <li>
-                News, job boards and Reddit are enabled for a new tenant because they need no key.
+                Coverage is uneven. A private careers page, a quiet quarter or an unsupported region
+                can produce nothing, and the product reports that instead of filling the gap.
               </li>
               <li>
-                X, Google Maps, Facebook pages and review feeds are opt-in and require credentials
-                or a feed. They do not silently pretend to run.
+                Some sources are only available in some markets. Where a source is missing, the rest
+                of the search still runs.
               </li>
               <li>
-                The catalog has {SIGNAL_TOTALS.signals} signals in {SIGNAL_TOTALS.categories}{" "}
-                categories. {SIGNAL_TOTALS.live} are live, {SIGNAL_TOTALS.partlyLive} are partly
-                live and {SIGNAL_TOTALS.byHand} are by hand.
-              </li>
-              <li>
-                A tenant can toggle the automatic signals it wants. By-hand signals cannot be
-                enabled because no adapter backs the switch.
+                Older clues rank lower. A ninety-day-old moment is never presented like yesterday&apos;s
+                news.
               </li>
             </ul>
           </section>
@@ -242,8 +215,8 @@ export default function HowItWorksPage() {
             </dl>
 
             <p className={styles.smallNote}>
-              The same dossier is available over the REST API and through MCP. Tools and the
-              dashboard read the same records, so a model cannot see a cleaner story than you do.
+              The same dossier is what your agent sees — same evidence, same caveats, same approval
+              step. A model cannot be shown a cleaner story than you are.
             </p>
           </section>
 
@@ -330,19 +303,19 @@ export default function HowItWorksPage() {
                   careers page or a region outside your Maps query can produce nothing.
                 </li>
                 <li>
-                  It will not turn a by-hand signal into an automatic one. The label means the
-                  evidence is gathered outside the adapters, with no staffed-research promise.
+                  It will not guarantee a lead for every company or a reply for every message. A
+                  signal is a reason to talk, not a promise to buy.
                 </li>
                 <li>
-                  It will not claim, send or top up without an action. The MCP instructions tell a
-                  model to ask first.
+                  It will not claim, send or top up without your action, even when an agent is doing
+                  the work.
                 </li>
               </ul>
             </div>
 
             <div className={styles.pager}>
-              <Link href="/integrations">Next: integration reference</Link>
-              <Link href="/trust">Trust and data notes</Link>
+              <Link href="/">Back to the overview</Link>
+              <Link href="/signup">Get 10 free leads</Link>
             </div>
           </section>
         </div>
