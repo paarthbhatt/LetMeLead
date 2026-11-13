@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { Hero } from "@/components/marketing/hero";
+import { Audiences, Compare, ProofBand } from "@/components/marketing/landing-sections";
 import { PricingBand } from "@/components/marketing/pricing-band";
 import { ProductDemo } from "@/components/marketing/product-demo";
 import { ProductSections } from "@/components/marketing/product-sections";
@@ -24,9 +25,12 @@ export default function Home() {
   return (
     <MarketingShell>
       <Hero />
+      <ProofBand />
+      <Audiences />
       <ProductDemo />
-      <PricingBand />
       <ProductSections />
+      <Compare />
+      <PricingBand />
     </MarketingShell>
   );
 }

@@ -3,22 +3,22 @@
   (which is dark by default) never leaks into the public pages.
 */
 .mkt-root {
-  --mkt-paper: #f4f6fa;
-  --mkt-paper-deep: #eceff6;
-  --mkt-panel: #ffffff;
-  --mkt-ink: #15171c;
-  --mkt-ink-soft: #2b303a;
-  --mkt-muted: #596371;
-  --mkt-faint: #7b8492;
-  --mkt-line: #dce2eb;
-  --mkt-line-soft: #e7ebf2;
-  --mkt-blue: #355cb3;
-  --mkt-blue-bright: #517be8;
-  --mkt-blue-wash: #eef2fc;
-  --mkt-amber: #a3711f;
-  --mkt-amber-wash: #fbf3e4;
+  --mkt-paper: #f6f4ee;
+  --mkt-paper-deep: #efece2;
+  --mkt-panel: #fffdf8;
+  --mkt-ink: #14151a;
+  --mkt-ink-soft: #2a2c33;
+  --mkt-muted: #5a5f68;
+  --mkt-faint: #6a6c65;
+  --mkt-line: #ded8ca;
+  --mkt-line-soft: #e9e4d8;
+  --mkt-blue: #2b46c8;
+  --mkt-blue-bright: #3a5ae8;
+  --mkt-blue-wash: #eef1fd;
+  --mkt-amber: #c2560a;
+  --mkt-amber-wash: #fdf1e3;
   --mkt-green: #2f6b4f;
-  --mkt-radius: 14px;
+  --mkt-radius: 16px;
 
   color-scheme: light;
   background: var(--mkt-paper);
@@ -62,7 +62,7 @@
   top: 0;
   z-index: 40;
   border-bottom: 1px solid transparent;
-  background: rgb(244 246 250 / 82%);
+  background: rgb(246 244 238 / 84%);
   backdrop-filter: blur(14px) saturate(140%);
   transition: border-color 160ms ease;
 }
@@ -177,8 +177,8 @@
 }
 
 .mkt-btn:hover {
-  border-color: #c6cede;
-  background: #fbfcfe;
+  border-color: #cfc7b6;
+  background: var(--mkt-panel);
 }
 
 .mkt-btn:active {
@@ -186,14 +186,15 @@
 }
 
 .mkt-btn[data-tone="solid"] {
-  border-color: var(--mkt-ink);
-  background: var(--mkt-ink);
+  border-color: #a9480a;
+  background: linear-gradient(180deg, #d35f0e, #bd5106);
   color: #fff;
+  box-shadow: 0 1px 0 rgb(255 255 255 / 18%) inset, 0 8px 20px -12px rgb(194 86 10 / 60%);
 }
 
 .mkt-btn[data-tone="solid"]:hover {
-  background: #23262e;
-  border-color: #23262e;
+  background: linear-gradient(180deg, #df6a15, #c2560a);
+  border-color: #94400a;
 }
 
 .mkt-btn[data-tone="quiet"] {
@@ -274,23 +275,36 @@
 /* ---------- hero ---------- */
 
 .mkt-hero {
-  padding-block: clamp(44px, 5.4vw, 76px) clamp(36px, 4vw, 56px);
+  position: relative;
+  padding-block: clamp(48px, 6vw, 88px) clamp(36px, 4vw, 60px);
+}
+
+.mkt-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 62%;
+  background:
+    radial-gradient(60% 80% at 78% 8%, rgb(43 70 200 / 7%), transparent 70%),
+    radial-gradient(50% 70% at 8% 0%, rgb(194 86 10 / 6%), transparent 72%);
+  pointer-events: none;
 }
 
 .mkt-hero-grid {
+  position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 0.94fr);
-  gap: clamp(28px, 4vw, 56px);
-  align-items: start;
+  grid-template-columns: minmax(0, 1.02fr) minmax(0, 0.92fr);
+  gap: clamp(32px, 4.4vw, 64px);
+  align-items: center;
 }
 
 .mkt-hero h1 {
-  max-width: 15ch;
+  max-width: 14ch;
   margin: 18px 0 0;
-  font-size: clamp(38px, 5.6vw, 66px);
-  font-weight: 680;
-  line-height: 1.02;
-  letter-spacing: -0.05em;
+  font-size: clamp(42px, 6.2vw, 82px);
+  font-weight: 720;
+  line-height: 0.98;
+  letter-spacing: -0.055em;
   text-wrap: balance;
 }
 
@@ -313,7 +327,26 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 10px;
-  margin-top: 26px;
+  margin-top: 28px;
+}
+
+.mkt-hero-note {
+  max-width: 44ch;
+  margin: 16px 0 0;
+  color: var(--mkt-faint);
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+
+.mkt-hero-instrument {
+  min-width: 0;
+}
+
+.mkt-instrument-caption {
+  margin: 10px 2px 0;
+  color: var(--mkt-faint);
+  font-size: 11px;
+  line-height: 1.5;
 }
 
 .mkt-hero-facts {
@@ -455,7 +488,7 @@
   gap: 12px;
   padding: 14px 16px 16px;
   border-top: 1px solid var(--mkt-line-soft);
-  background: linear-gradient(180deg, #fbfcfe, #f7f9fc);
+  background: linear-gradient(180deg, #fffdf8, #f7f3e9);
 }
 
 .mkt-stages {
@@ -646,4 +679,129 @@
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* ------------------------------------------------------------------
+   Night surface
+
+   The public site follows the visitor's clock: dark after 19:00 and
+   before 07:00, light otherwise, and a switch in the header overrides
+   the clock for good. Everything below re-points the same tokens, so
+   components keep their structure and only the surface changes.
+------------------------------------------------------------------ */
+
+html[data-site-theme="dark"] .mkt-root {
+  color-scheme: dark;
+  --mkt-paper: #101216;
+  --mkt-paper-deep: #0b0d10;
+  --mkt-panel: #171a1f;
+  --mkt-ink: #f4f3ef;
+  --mkt-ink-soft: #dedcd5;
+  --mkt-muted: #a8adb7;
+  --mkt-faint: #969ca7;
+  --mkt-line: #2c3038;
+  --mkt-line-soft: #23262c;
+  --mkt-blue: #93a9ff;
+  --mkt-blue-bright: #adbdff;
+  --mkt-blue-wash: #1a2031;
+  --mkt-amber: #f0a35c;
+  --mkt-amber-wash: #241a11;
+  --mkt-green: #7bd3a7;
+}
+
+html[data-site-theme="dark"] .mkt-root ::selection {
+  background: rgb(147 169 255 / 26%);
+}
+
+html[data-site-theme="dark"] .mkt-header {
+  background: rgb(16 18 22 / 82%);
+}
+
+html[data-site-theme="dark"] .mkt-btn:hover {
+  border-color: #3a3f49;
+}
+
+html[data-site-theme="dark"] .mkt-btn[data-tone="quiet"]:hover,
+html[data-site-theme="dark"] .mkt-icon-btn:hover {
+  background: rgb(255 255 255 / 7%);
+}
+
+html[data-site-theme="dark"] .mkt-btn[data-tone="solid"] {
+  border-color: #b8712c;
+  background: linear-gradient(180deg, #efab68, #d9893f);
+  color: #1b1206;
+  box-shadow: 0 1px 0 rgb(255 255 255 / 26%) inset, 0 10px 26px -14px rgb(240 163 92 / 45%);
+}
+
+html[data-site-theme="dark"] .mkt-btn[data-tone="solid"]:hover {
+  border-color: #a8621f;
+  background: linear-gradient(180deg, #f5b777, #e0954a);
+}
+
+html[data-site-theme="dark"] .mkt-instrument {
+  box-shadow: 0 1px 2px rgb(0 0 0 / 40%), 0 24px 60px -32px rgb(0 0 0 / 70%);
+}
+
+html[data-site-theme="dark"] .mkt-instrument-controls {
+  background: linear-gradient(180deg, #191c22, #14171b);
+}
+
+html[data-site-theme="dark"] .mkt-mobile-panel {
+  box-shadow: 0 20px 48px -20px rgb(0 0 0 / 70%);
+}
+
+html[data-site-theme="dark"] .mkt-mobile-panel a[data-tone="solid"] {
+  background: var(--mkt-ink);
+  color: #101216;
+}
+
+html[data-site-theme="dark"] .mkt-mobile-panel a[data-tone="solid"]:hover {
+  background: #ffffff;
+}
+
+/* The header switch */
+.mkt-theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  margin-left: 14px;
+  border: 1px solid var(--mkt-line);
+  border-radius: 9px;
+  background: transparent;
+  color: var(--mkt-muted);
+  cursor: pointer;
+  transition: background 130ms ease, color 130ms ease, border-color 130ms ease;
+}
+
+.mkt-theme-toggle:hover {
+  border-color: var(--mkt-line);
+  background: rgb(21 23 28 / 5%);
+  color: var(--mkt-ink);
+}
+
+html[data-site-theme="dark"] .mkt-theme-toggle:hover {
+  background: rgb(255 255 255 / 8%);
+}
+
+.mkt-theme-toggle span {
+  display: inline-flex;
+}
+
+@media (max-width: 880px) {
+  .mkt-theme-toggle {
+    margin-left: auto;
+    margin-right: 8px;
+  }
+}
+
+html[data-site-theme="dark"] .mkt-stage[data-active="true"] {
+  color: #101216;
+}
+
+/* Hero texture needs a stacking context so the grain sits under the copy. */
+.mkt-hero {
+  position: relative;
+  isolation: isolate;
 }
