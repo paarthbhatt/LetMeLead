@@ -1,0 +1,488 @@
+/* ------------------------------------------------------------------
+   Visual system for the marketing page: one diagram language, drawn
+   with CSS and inline SVG, animated only where it explains something.
+------------------------------------------------------------------ */
+
+/* ---------- pipeline diagram ---------- */
+
+.pipeline {
+  margin: 38px 0 0;
+}
+
+.pipeRow {
+  display: flex;
+  align-items: stretch;
+}
+
+.pipeNode {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px 16px 15px;
+  border: 1px solid var(--mkt-line);
+  border-radius: 14px;
+  background: var(--mkt-panel);
+  transition:
+    border-color 220ms ease,
+    transform 220ms ease,
+    box-shadow 220ms ease;
+}
+
+.pipeNode:hover {
+  border-color: color-mix(in srgb, var(--mkt-blue) 42%, var(--mkt-line));
+  transform: translateY(-2px);
+  box-shadow: 0 18px 36px -30px rgb(18 20 26 / 55%);
+}
+
+.pipeArt {
+  position: relative;
+  height: 48px;
+  margin-bottom: 2px;
+}
+
+.pipeKicker {
+  margin: 0;
+  color: var(--mkt-faint);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.pipeTitle {
+  margin: 0;
+  color: var(--mkt-ink);
+  font-size: 13.5px;
+  font-weight: 650;
+  letter-spacing: -0.015em;
+  line-height: 1.35;
+}
+
+.pipeNote {
+  margin: 0;
+  color: var(--mkt-muted);
+  font-size: 11.5px;
+  line-height: 1.5;
+}
+
+.pipeLink {
+  position: relative;
+  width: 46px;
+  flex: 0 0 46px;
+}
+
+.pipeLink::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 4px;
+  right: 4px;
+  height: 1px;
+  background-image: linear-gradient(90deg, var(--mkt-line) 55%, transparent 0);
+  background-size: 7px 1px;
+  background-repeat: repeat-x;
+}
+
+.pipePacket {
+  position: absolute;
+  top: calc(50% - 2.5px);
+  left: 0;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--mkt-amber);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--mkt-amber) 16%, transparent);
+  animation: packet 3.2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.pipePacket:nth-child(2) {
+  animation-delay: 1.6s;
+}
+
+@keyframes packet {
+  0% {
+    left: 0;
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  18% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  82% {
+    opacity: 1;
+  }
+  100% {
+    left: calc(100% - 5px);
+    opacity: 0;
+    transform: scale(0.6);
+  }
+}
+
+/* art: scattered public moments */
+.signalScatter {
+  position: absolute;
+  inset: 0;
+}
+
+.signalScatter span {
+  position: absolute;
+  left: calc(var(--x) * 1%);
+  top: calc(var(--y) * 1%);
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--mkt-blue);
+  opacity: 0.45;
+  animation: signalFloat 7s ease-in-out infinite alternate;
+  animation-delay: var(--d);
+}
+
+.signalScatter span[data-hot="true"] {
+  width: 7px;
+  height: 7px;
+  background: var(--mkt-amber);
+  opacity: 1;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--mkt-amber) 18%, transparent);
+}
+
+@keyframes signalFloat {
+  from {
+    transform: translateY(-2px);
+  }
+  to {
+    transform: translateY(2px);
+  }
+}
+
+/* art: the fit gate */
+.gate {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+}
+
+.gateBar {
+  width: 2px;
+  height: 34px;
+  border-radius: 2px;
+  background: var(--mkt-line);
+}
+
+.gateDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--mkt-blue);
+  opacity: 0.35;
+}
+
+.gateDot[data-pass="true"] {
+  background: var(--mkt-amber);
+  opacity: 1;
+  animation: gatePass 4.6s ease-in-out infinite;
+}
+
+@keyframes gatePass {
+  0%,
+  18% {
+    transform: translateX(-26px) scale(0.8);
+    opacity: 0.15;
+  }
+  40% {
+    opacity: 1;
+  }
+  62%,
+  100% {
+    transform: translateX(26px) scale(1);
+    opacity: 1;
+  }
+}
+
+/* art: the dossier card */
+.miniDossier {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: grid;
+  width: 78px;
+  gap: 4px;
+  padding: 8px 8px 9px;
+  border: 1px solid var(--mkt-line);
+  border-radius: 7px;
+  background: var(--mkt-paper);
+  transform: translate(-50%, -50%) rotate(-1.4deg);
+  box-shadow: 0 8px 18px -14px rgb(18 20 26 / 60%);
+}
+
+.miniDossier i {
+  display: block;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--mkt-line-soft);
+}
+
+.miniDossier i:nth-child(1) {
+  width: 55%;
+  background: var(--mkt-ink);
+  opacity: 0.5;
+}
+
+.miniDossier i:nth-child(3) {
+  width: 84%;
+}
+
+.miniDossier i:nth-child(4) {
+  width: 60%;
+  background: var(--mkt-amber);
+  opacity: 0.75;
+}
+
+/* art: the decision */
+.decide {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border: 1.5px solid color-mix(in srgb, var(--mkt-blue) 55%, var(--mkt-line));
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.decide::before {
+  content: "";
+  width: 15px;
+  height: 8px;
+  border-bottom: 2px solid var(--mkt-blue);
+  border-left: 2px solid var(--mkt-blue);
+  transform: translateY(-2px) rotate(-45deg);
+}
+
+.decide::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border: 1px solid color-mix(in srgb, var(--mkt-blue) 24%, transparent);
+  border-radius: 50%;
+  animation: decidePulse 4s ease-out infinite;
+}
+
+@keyframes decidePulse {
+  0% {
+    transform: scale(0.85);
+    opacity: 0;
+  }
+  35% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1.22);
+    opacity: 0;
+  }
+}
+
+.pipeCaption {
+  margin: 14px 0 0;
+  color: var(--mkt-faint);
+  font-size: 11.5px;
+  line-height: 1.6;
+}
+
+@media (max-width: 900px) {
+  .pipeRow {
+    flex-direction: column;
+  }
+
+  .pipeLink {
+    width: 100%;
+    height: 34px;
+    flex: 0 0 34px;
+  }
+
+  .pipeLink::before {
+    top: 4px;
+    bottom: 4px;
+    left: 50%;
+    right: auto;
+    width: 1px;
+    height: auto;
+    background-image: linear-gradient(180deg, var(--mkt-line) 55%, transparent 0);
+    background-size: 1px 7px;
+    background-repeat: repeat-y;
+  }
+
+  .pipePacket {
+    top: 0;
+    left: calc(50% - 2.5px);
+    animation-name: packetDown;
+  }
+
+  @keyframes packetDown {
+    0% {
+      top: 0;
+      opacity: 0;
+    }
+    18% {
+      opacity: 1;
+    }
+    82% {
+      opacity: 1;
+    }
+    100% {
+      top: calc(100% - 5px);
+      opacity: 0;
+    }
+  }
+}
+
+/* ---------- credit grid ---------- */
+
+.creditVisual {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--mkt-line);
+  border-radius: 14px;
+  background: var(--mkt-panel);
+}
+
+.creditGrid {
+  display: grid;
+  grid-template-columns: repeat(20, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.creditDot {
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--mkt-line);
+  opacity: 0;
+}
+
+.creditGrid[data-run="true"] .creditDot {
+  animation: creditIn 260ms ease-out both;
+  animation-delay: calc(var(--i) * 6ms);
+}
+
+.creditDot[data-hot="true"] {
+  background: var(--mkt-amber);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--mkt-amber) 20%, transparent);
+}
+
+@keyframes creditIn {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.creditMeta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0;
+  color: var(--mkt-muted);
+  font-size: 11.5px;
+  line-height: 1.5;
+}
+
+.creditMeta strong {
+  color: var(--mkt-ink);
+  font-variant-numeric: tabular-nums;
+  font-weight: 650;
+}
+
+/* ---------- spotlight surface ---------- */
+
+.spotlight {
+  position: relative;
+  border-radius: inherit;
+}
+
+.spotlight::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    300px circle at var(--spot-x, 50%) var(--spot-y, 0%),
+    color-mix(in srgb, var(--mkt-blue) 17%, transparent),
+    transparent 72%
+  );
+  opacity: var(--spot-on, 0);
+  transition: opacity 240ms ease;
+  pointer-events: none;
+}
+
+/* ---------- scroll progress ---------- */
+
+.progress {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 60;
+  height: 2px;
+  pointer-events: none;
+}
+
+.progress span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--mkt-blue), var(--mkt-amber));
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+}
+
+/* ---------- hero grain ---------- */
+
+.heroTexture::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 0.34;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.16'/%3E%3C/svg%3E");
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+
+.heroTexture > * {
+  position: relative;
+  z-index: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pipePacket,
+  .signalScatter span,
+  .gateDot[data-pass="true"],
+  .decide::after {
+    animation: none;
+  }
+
+  .pipePacket {
+    opacity: 0.8;
+    left: 50%;
+  }
+
+  .creditDot {
+    opacity: 1;
+    animation: none;
+  }
+
+  .progress span {
+    transition: none;
+  }
+}
